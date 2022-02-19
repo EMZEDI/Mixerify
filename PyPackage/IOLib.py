@@ -72,7 +72,7 @@ def create_feature_dataset(all_playlists_IDList: list, spotify: spotipy.Spotify)
             coln.drop('track_href', axis=1, inplace=True)
             coln.drop('uri', axis=1, inplace=True)
             coln.drop('type', axis=1, inplace=True)
-            coln.set_index('id', inplace=True)
-            final_df = final_df.append(coln, ignore_index=True)
+            final_df = pd.concat([final_df, coln], ignore_index=True)
 
+    final_df.set_index('id', inplace=True)
     return final_df
