@@ -39,10 +39,24 @@ def playlist_tracks_IDList_generator(playlist_id, spotify: spotipy.Spotify):
     i: int = 0
     # Track ID list
     iD_list: list = []
-    spot_Dict: dict = spotify.playlist_items(playlist_id=playlist_id)['items']
+    item_list = []
+    curr = []
+    # 100 by 100 add songs to the list
+    offset = 0
+
     while True:
+        # first iteration
+        curr = spotify.playlist_items(playlist_id=playlist_id, offset=offset)['items']
+        if len(curr) == 0:
+            break
+        item_list += curr
+        offset += 100
+
+    # create the final ID list
+    while True:
+
         try:
-            iD_list.append(spot_Dict[i]['track']['id'])
+            iD_list.append(item_list[i]['track']['id'])
             i += 1
         except:
             break
@@ -76,3 +90,13 @@ def create_feature_dataset(all_playlists_IDList: list, spotify: spotipy.Spotify)
 
     final_df.set_index('id', inplace=True)
     return final_df
+
+
+def generate_csvFile_for_sourceData(feature_df):
+    """
+    reads the dataset as a dataframe and generates the data csv file
+    :param feature_df:
+    :return:
+    """
+    feature_df.to_csv('data.csv')
+    return
