@@ -1,11 +1,6 @@
+import pandas as pd
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.datasets import make_blobs
-from sklearn.cluster import KMeans
 
 
 # YOUR spotify data
@@ -27,6 +22,7 @@ def run_spotifyForDev(client_id, client_secret):
         client_id=client_id,
         client_secret=client_secret))
 
+
 def generate_ids(path):
     """
     Creates a list of all IDs of the playlist from the excel file (input path to file). 
@@ -34,17 +30,16 @@ def generate_ids(path):
     :return: list
     """
     df = pd.read_excel(path)
-    
+
     id_list = []
-    
+
     for i, j in df.iterrows():
-        
-        #in the excel file the link is in the 2nd column
+        # in the excel file the link is in the 2nd column
         link = str(j[1])
         id = link.replace("https://open.spotify.com/playlist/", '')
         id = id[:id.find('?')]
         id_list.append(id)
-        
+
     return id_list
 
 
@@ -98,7 +93,7 @@ def create_feature_dataset(all_playlists_IDList: list, spotify: spotipy.Spotify)
         # we have the playlist and have to create the list of tracks IDs of that specific playlist
         tracksIDs: list = playlist_tracks_IDList_generator(playlist_ID, spotify)
         # iterate thru the list of track IDs and generate each feature
-        
+
         for trackID in tracksIDs:
             try:
                 feat_dict = spotify.audio_features(trackID)
@@ -108,8 +103,9 @@ def create_feature_dataset(all_playlists_IDList: list, spotify: spotipy.Spotify)
                 coln.drop('uri', axis=1, inplace=True)
                 coln.drop('type', axis=1, inplace=True)
                 final_df = pd.concat([final_df, coln], ignore_index=True)
-            #for songs that don't work
-            except: 
+            # for songs that don't work
+            except:
+                continue
 
     final_df.set_index('id', inplace=True)
     return final_df
