@@ -1,6 +1,12 @@
 import pandas as pd
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+import seaborn as sns
+import plotly.graph_objs as go
+from yellowbrick.cluster import KElbowVisualizer
+from sklearn.cluster import KMeans
 
 
 # YOUR spotify data
@@ -119,3 +125,33 @@ def generate_csvFile_for_sourceData(feature_df):
     """
     feature_df.to_csv('data.csv')
     return
+
+
+def show_visualized_elbow(file_name=None, data_frame=None):
+    """
+    Given the data file/frame, it will show the elbow graph up to 40 iterations - Only one arg must be given.
+    Use filename= or data_frame=
+    :param data_frame: data frame instead of csv file
+    :param file_name: csv file of the data
+    :return: None -> shows the graph for the elbow method of the KMeans
+    """
+    if file_name is None:
+        if data_frame is None:
+            raise AssertionError("enter exactly One arg")
+        else:
+            cluster_df = data_frame.iloc[:, 1:]
+    else:
+        if data_frame is not None:
+            raise AssertionError("Both args cant be given / only one please")
+        else:
+            cluster_df = pd.read_csv(file_name).iloc[:, 1:]
+
+    # create kmean model to test and graph
+    model = KMeans()
+    # iterations up to 40
+    visualizer = KElbowVisualizer(model, k=(1, 40))
+    visualizer.fit(cluster_df)
+    visualizer.show()
+
+
+def elbow
