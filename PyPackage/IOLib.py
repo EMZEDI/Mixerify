@@ -1,6 +1,12 @@
 import pandas as pd
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+import seaborn as sns
+import plotly.graph_objs as go
+from yellowbrick.cluster import KElbowVisualizer
+from sklearn.cluster import KMeans
 
 
 # YOUR spotify data
@@ -108,7 +114,26 @@ def create_feature_dataset(all_playlists_IDList: list, spotify: spotipy.Spotify)
                 continue
 
     final_df.set_index('id', inplace=True)
+    # remove duplicates from the dataframe
+    final_df.drop_duplicates(keep='last', inplace=True)
     return final_df
+
+
+def merge_UserInput_with_SourceDF(user_df: pd.DataFrame, source_df: pd.DataFrame):
+    """
+    Reads the user feature dataset and merges that to the end of the source dataset. Removes the duplicates
+    found in the source with the users dataset. It returns a tuple. first element is the merged dataset
+    and the second is starting index of the user dataset.
+    :param source_df: source dataframe
+    :param user_df: user feature data frame
+    :return: a tuple
+    """
+    start = source_df.index.size + 1
+    # Merge the two datasets and remove the duplicates
+    final_df = pd.concat([user_df, source_df])
+    # remove the duplicates and keep the last
+    final_df.drop_duplicates(inplace=True, keep='last')
+    return final_df, start
 
 
 def generate_csvFile_for_sourceData(feature_df):
@@ -119,3 +144,62 @@ def generate_csvFile_for_sourceData(feature_df):
     """
     feature_df.to_csv('data.csv')
     return
+
+
+def show_visualized_elbow(file_name=None, data_frame=None):
+    """
+    Given the data file/frame, it will show the elbow graph up to 40 iterations - Only one arg must be given.
+    Use filename= or data_frame=
+    :param data_frame: data frame instead of csv file
+    :param file_name: csv file of the data
+    :return: None -> shows the graph for the elbow method of the KMeans
+    """
+    if file_name is None:
+        if data_frame is None:
+            raise AssertionError("enter exactly One arg")
+        else:
+            cluster_df = data_frame.iloc[:, 1:]
+    else:
+        if data_frame is not None:
+            raise AssertionError("Both args cant be given / only one please")
+        else:
+            cluster_df = pd.read_csv(file_name).iloc[:, 1:]
+
+    # create kmean model to test and graph
+    model = KMeans()
+    # iterations up to 40
+    visualizer = KElbowVisualizer(model, k=(1, 40))
+    visualizer.fit(cluster_df)
+    visualizer.show()
+
+
+def elbow_test(file_name=None, data_frame=None):
+    """
+    Given the data file/frame, it will show the elbow graph up to 40 iterations - Only one arg must be given.
+    Use filename= or data_frame=
+    :param file_name: filename
+    :param data_frame: dataframe which can be given or not
+    :return: None -> shows the graph for the elbow method of the KMeans
+    """
+    if file_name is None:
+        if data_frame is None:
+            raise AssertionError("enter exactly One arg")
+        else:
+            cluster_df = data_frame.iloc[:, 1:]
+    else:
+        if data_frame is not None:
+            raise AssertionError("Both args cant be given / only one please")
+        else:
+            cluster_df = pd.read_csv(file_name).iloc[:, 1:]
+
+    Sum_of_squared_distances = []
+    K = range(1, 40)
+    for num_clusters in K:
+        kmeans = KMeans(n_clusters=num_clusters)
+        kmeans.fit(cluster_df)
+        Sum_of_squared_distances.append(kmeans.inertia_)
+    plt.plot(K, Sum_of_squared_distances, 'bx-')
+    plt.xlabel('Values of K')
+    plt.ylabel('Sum of squared distances/Inertia')
+    plt.title('Elbow Method For Optimal k')
+    plt.show()
