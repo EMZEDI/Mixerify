@@ -149,6 +149,7 @@ def generate_csvFile_for_sourceData(feature_df):
 def show_visualized_elbow(file_name=None, data_frame=None):
     """
     Given the data file/frame, it will show the elbow graph up to 40 iterations - Only one arg must be given.
+    Its better to only use data frame since the data frame may be the mixed dataset in your case
     Use filename= or data_frame=
     :param data_frame: data frame instead of csv file
     :param file_name: csv file of the data
@@ -176,6 +177,7 @@ def show_visualized_elbow(file_name=None, data_frame=None):
 def elbow_test(file_name=None, data_frame=None):
     """
     Given the data file/frame, it will show the elbow graph up to 40 iterations - Only one arg must be given.
+    Its better to only use data frame since the data frame may be the mixed dataset in your case
     Use filename= or data_frame=
     :param file_name: filename
     :param data_frame: dataframe which can be given or not
@@ -203,3 +205,29 @@ def elbow_test(file_name=None, data_frame=None):
     plt.ylabel('Sum of squared distances/Inertia')
     plt.title('Elbow Method For Optimal k')
     plt.show()
+
+
+def num_clusters(file_name=None, data_frame=None):
+    """
+    Given either the filename or the dataset, returns the number of the clusters that must be made.
+    Its better to only use data frame since the data frame may be the mixed dataset in your case
+    :param file_name: file name
+    :param data_frame: dataset data frame
+    :return: number of the clusters
+    """
+    if file_name is None:
+        if data_frame is None:
+            raise AssertionError("enter exactly One arg")
+        else:
+            cluster_df = data_frame.iloc[:, 1:]
+    else:
+        if data_frame is not None:
+            raise AssertionError("Both args cant be given / only one please")
+        else:
+            cluster_df = pd.read_csv(file_name).iloc[:, 1:]
+
+    model = KMeans()
+    visualizer = KElbowVisualizer(model, k=(1,30))
+    visualizer.fit(cluster_df)
+    return visualizer.elbow_value_
+
