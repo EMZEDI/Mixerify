@@ -227,7 +227,27 @@ def num_clusters(file_name=None, data_frame=None):
             cluster_df = pd.read_csv(file_name).iloc[:, 1:]
 
     model = KMeans()
-    visualizer = KElbowVisualizer(model, k=(1,30))
+    visualizer = KElbowVisualizer(model, k=(1, 30))
     visualizer.fit(cluster_df)
     return visualizer.elbow_value_
 
+
+def create_cluster_for_mixed_data(num_clusters: int, dataframe: pd.DataFrame):
+    """
+    creates the cluster object for the KMeans and returns the object
+    :param dataframe: the mixed dataframe
+    :param num_clusters: number of the clusters as an integer
+    :return: cluster object
+    """
+    kmeans = KMeans(n_clusters=num_clusters, n_init=200, max_iter=500, init='k-means++', algorithm="elkan")
+    return kmeans.fit(dataframe)
+
+# return a dictionary that maps each cluster to a tuple
+# first element will be a list of ids of songs (user input),
+# second element the number of songs from the user input in that cluster
+#######################################################################################
+
+# a function that uses the returned tuple from the former function and checks + sorts
+# 1st nearest neighbor to each point of users input from the source
+# and computes the ratio of the songs in each cluster
+# using that info, it returns the top 50 songs.
