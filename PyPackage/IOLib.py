@@ -240,7 +240,7 @@ def create_cluster_for_mixed_data(num_clusters: int, dataframe: pd.DataFrame):
     :return: cluster object
     """
     kmeans = KMeans(n_clusters=num_clusters, n_init=200, max_iter=500, init='k-means++', algorithm="elkan")
-    return kmeans
+    return kmeans.fit(dataframe)
 
 # return a dictionary that maps each cluster to a tuple
 # first element will be a list of ids of songs (user input),
