@@ -227,7 +227,7 @@ def num_clusters(file_name=None, data_frame=None):
             cluster_df = pd.read_csv(file_name).iloc[:, 1:]
 
     model = KMeans()
-    visualizer = KElbowVisualizer(model, k=(1, 30))
+    visualizer = KElbowVisualizer(model, k=(1, 40))
     visualizer.fit(cluster_df)
     return visualizer.elbow_value_
 
