@@ -128,9 +128,9 @@ def merge_UserInput_with_SourceDF(user_df: pd.DataFrame, source_df: pd.DataFrame
     :param user_df: user feature data frame
     :return: a tuple
     """
-    start = source_df.index.size + 1
+    start = source_df.index.size
     # Merge the two datasets and remove the duplicates
-    final_df = pd.concat([user_df, source_df])
+    final_df = pd.concat([source_df, user_df])
     # remove the duplicates and keep the last
     final_df.drop_duplicates(inplace=True, keep='last')
     return final_df, start
@@ -251,6 +251,30 @@ starting index of the user input in the main dataset which can be used in the lo
 necessary inputs: # of clusters + user data start index + mixed dataframe
 lmk if we have to add more inputs. 
 """
+def assign_clusters(model: KMeans, num_clusters: int, dataframe: pd.DataFrame, user_start_index: int):
+    """
+    returns a dictionary that maps each cluster number to a list of tuples
+    the first element of the tuple is the ID of the song from user input in that cluster
+    the second element is the index of the song in the dataset
+    :param model: KMeans model object
+    :param num_clusters: number of clusters as an integer
+    :param dataframe: mixed dataframe
+    :param user_start_index: index of first user song in mixed dataframe
+    :return: dict mapping ints to a list of tuples
+    """
+    dict = {}
+    for i in range(num_clusters):
+        dict[i] = []
+
+    #list of clusters for each user song
+    cluster = model.predict(dataframe.iloc[user_start_index: len(dataframe)])
+
+    for i in range(len(cluster)):
+        id = dataframe.index[i+user_start_index]
+        dict[cluster[i]].append((id, i+user_start_index))
+    
+    return dict
+
 ######################################################################################
 
 """
