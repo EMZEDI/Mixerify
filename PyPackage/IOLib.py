@@ -242,12 +242,26 @@ def create_cluster_for_mixed_data(num_clusters: int, dataframe: pd.DataFrame):
     kmeans = KMeans(n_clusters=num_clusters, n_init=200, max_iter=500, init='k-means++', algorithm="elkan")
     return kmeans.fit(dataframe)
 
-# return a dictionary that maps each cluster to a tuple
-# first element will be a list of ids of songs (user input),
-# second element the number of songs from the user input in that cluster
+"""
+return a dictionary that maps each cluster number to a list of tuples
+first element will be the id of the song from the user input in the same cluster
+second element will be the index of that specific song in the main merged dataset.
+HINT: the second element returned from the "merge_UserInput_with_SourceDF" function is the
+starting index of the user input in the main dataset which can be used in the loops
+"""
+######################################################################################
+
+"""
+a function that uses the returned list from the former function and checks + sorts
+1st nearest neighbor to each point of users input from the source (in each cluster)
+(from the source: means that the neihbors are chosen among merged_dataset[:startingIndexOfUserinput,:])
+and computes the ratio of the songs in each cluster -> based on that, adds the first k nearest 
+to the list of songs
+using that info, it returns the top 50 songs.
+"""
 #######################################################################################
 
-# a function that uses the returned tuple from the former function and checks + sorts
-# 1st nearest neighbor to each point of users input from the source
-# and computes the ratio of the songs in each cluster
-# using that info, it returns the top 50 songs.
+"""
+a function that creates a spotify playlist using the API given the list of 50 track ids.
+we have to add picture and disctiption to the playlist as well!
+"""
