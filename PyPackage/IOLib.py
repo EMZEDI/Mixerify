@@ -229,7 +229,7 @@ def num_clusters(file_name=None, data_frame=None):
     model = KMeans()
     visualizer = KElbowVisualizer(model, k=(1, 40))
     visualizer.fit(cluster_df)
-    return visualizer.elbow_value_
+    return int(visualizer.elbow_value_)
 
 
 def create_cluster_for_mixed_data(num_clusters: int, dataframe: pd.DataFrame):
