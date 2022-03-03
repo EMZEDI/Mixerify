@@ -248,6 +248,8 @@ first element will be the id of the song from the user input in the same cluster
 second element will be the index of that specific song in the main merged dataset.
 HINT: the second element returned from the "merge_UserInput_with_SourceDF" function is the
 starting index of the user input in the main dataset which can be used in the loops
+necessary inputs: # of clusters + user data start index + mixed dataframe
+lmk if we have to add more inputs. 
 """
 ######################################################################################
 
