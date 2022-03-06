@@ -128,11 +128,14 @@ def merge_UserInput_with_SourceDF(user_df: pd.DataFrame, source_df: pd.DataFrame
     :param user_df: user feature data frame
     :return: a tuple
     """
-    start = source_df.index.size + 1
+    start = source_df.index.size
     # Merge the two datasets and remove the duplicates
-    final_df = pd.concat([user_df, source_df])
+    final_df = pd.concat([source_df, user_df])
+    prev_size = final_df.index.size
     # remove the duplicates and keep the last
     final_df.drop_duplicates(inplace=True, keep='last')
+    new_size = final_df.index.size
+    start = start - (prev_size - new_size)
     return final_df, start
 
 
@@ -242,26 +245,135 @@ def create_cluster_for_mixed_data(num_clusters: int, dataframe: pd.DataFrame):
     kmeans = KMeans(n_clusters=num_clusters, n_init=200, max_iter=500, init='k-means++', algorithm="elkan")
     return kmeans.fit(dataframe)
 
-"""
-return a dictionary that maps each cluster number to a list of tuples
-first element will be the id of the song from the user input in the same cluster
-second element will be the index of that specific song in the main merged dataset.
-HINT: the second element returned from the "merge_UserInput_with_SourceDF" function is the
-starting index of the user input in the main dataset which can be used in the loops
-necessary inputs: # of clusters + user data start index + mixed dataframe
-lmk if we have to add more inputs. 
-"""
-######################################################################################
 
-"""
-a function that uses the returned list from the former function and checks + sorts
-1st nearest neighbor to each point of users input from the source (in each cluster)
-(from the source: means that the neihbors are chosen among merged_dataset[:startingIndexOfUserinput,:])
-and computes the ratio of the songs in each cluster -> based on that, adds the first k nearest 
-to the list of songs
-using that info, it returns the top 50 songs.
-"""
-#######################################################################################
+def get_cluster_dataset(model: KMeans, num_clusters: int, dataframe: pd.DataFrame, user_start_index: int):
+    """
+    returns a dict mapping a cluster number to all elements of that cluster from dataset
+    :param model: KMeans model
+    :param num_clusters: number of clusters
+    :param dataframe: mixed dataframe
+    :param user_start_index: index of first user song in mixed dataframe
+    :return: list of clusters mapping to tuples of IDs and indices of songs
+    """
+    d = {}
+    for i in range(num_clusters):
+        d[i] = []
+
+    # list of clusters for each dataset song
+    cluster = model.labels_[:user_start_index]
+
+    for i in range(len(cluster)):
+        id = dataframe.index[i]
+        d[cluster[i]].append((id, i))
+
+    return d
+
+
+def get_cluster_user(model: KMeans, num_clusters: int, dataframe: pd.DataFrame, user_start_index: int):
+    """
+    returns a dict mapping a cluster number to all elements of that cluster from user songs
+    :param model: KMeans model
+    :param num_clusters: number of clusters
+    :param dataframe: mixed dataframe
+    :param user_start_index: index of first user song in mixed dataframe
+    :return: list of clusters mapping to tuples of IDs and indices of songs
+    """
+    d = {}
+    for i in range(num_clusters):
+        d[i] = []
+
+    #list of clusters for each user song
+    cluster = model.labels_[user_start_index: len(dataframe)]
+
+    for i in range(len(cluster)):
+        id = dataframe.index[i+user_start_index]
+        d[cluster[i]].append((id, i+user_start_index))
+
+    return d
+
+
+def KNN_models(cluster_list: dict, dataframe: pd.DataFrame):
+    """
+    returns a dict mapping a cluster to its fitted NearestNeighbor object
+    uses songs from dataset (not user) to fit
+    :param cluster_list: dict mapping clusters to songs from dataset in that cluster
+    :param dataframe: mixed dataframe
+    :return: dict that maps clusters to NearestNeighbours model
+    """
+    keys = [i for i in range(len(cluster_list))]
+    models = dict.fromkeys(keys)
+
+    for cluster in cluster_list:
+        neigh = NearestNeighbors(n_neighbors=1)
+        
+        #indices of songs in the cluster
+        indices = [index for id, index in cluster_list[cluster]]
+
+        #fitting model using appropriate rows in the df
+        model = neigh.fit(dataframe.iloc[indices, :])
+        models[cluster] = model
+
+    return models
+
+
+def generate_recommendations(models: list, cluster_user_list: dict, dataframe: pd.DataFrame, user_start_index: int):
+    """
+    generates dict mapping cluster numbers to song recommendations as a tuple
+    in total there are 50 recommendations spread across clusters
+    the number of songs per cluster depends on the ratio of user songs in each cluster
+    songs are tuples where the first element is the distance from the user song
+    the second element is the index of the song relative to its position in the cluster_list from the prev function
+    :param models: dict mapping clusters to NearestNeighbor object
+    :param cluster_list: dictionary that maps cluster numbers to tuples of
+    ids and indices of the user songs
+    :param dataframe: mixed dataframe
+    :param user_start_index: index of first user song in mixed dataframe
+    :return: dict mapping clusters to list of recommendations as a tuple
+    """
+    neighbors = {}
+
+    for i in range(len(cluster_user_list)):
+        neighbors[i] = []
+
+    for cluster in cluster_user_list:
+        indices = [index for id, index in cluster_user_list[cluster]]
+
+        for i in indices:
+            #find nearest neighbor of each song in cluster
+            pred = models[cluster].kneighbors([dataframe.iloc[i]], return_distance=True)
+            #make tuple
+            pred_tup = pred[0][0][0], pred[1][0][0]
+            neighbors[cluster].append(pred_tup)
+
+    #WE ALSO GOTTA CHECK FOR DUPLICATEs
+
+    #sort and calculate ratios
+    n = len(dataframe) - user_start_index
+
+    for cluster in neighbors:
+        neighbors[cluster].sort()
+        #***check that this always outputs 50 songs
+        songs_per_cluster = int(round((len(neighbors[cluster])/n)*50, 0))
+        neighbors[cluster] = neighbors[cluster][:songs_per_cluster]
+
+    return neighbors
+
+
+def generate_recommendation_ids(rec_list: dict, cluster_dataset: dict):
+    """
+    generates a list of the recommendation song IDs
+    :param rec_list: dict mapping clusters to tuples of distances and indices of recommendations
+    :param cluster_dataset: dict mapping clusters to songs from dataset in that cluster
+    :return: list of 50 song IDs (sorted by distance)
+    """
+    recs = []
+
+    for cluster in rec_list:
+        for dist, index in rec_list[cluster]:
+            recs.append(cluster_dataset[cluster][index][0])
+
+    return recs
+
 
 """
 a function that creates a spotify playlist using the API given the list of 50 track ids.
