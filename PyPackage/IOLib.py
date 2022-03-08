@@ -10,11 +10,11 @@ from sklearn.cluster import KMeans
 
 
 # YOUR spotify data
-# ID = ""
-# SECRET = ""
-# spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(
-#         client_id=ID,
-#         client_secret=SECRET))
+ID = "102c97c518c84d26bca184d3568fc183"
+SECRET = "452b7ff0a52e4b11b5d04528f175b82a"
+spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(
+         client_id=ID,
+         client_secret=SECRET))
 
 
 def run_spotifyForDev(client_id, client_secret):
