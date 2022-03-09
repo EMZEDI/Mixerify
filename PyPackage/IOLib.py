@@ -1,5 +1,6 @@
 import pandas as pd
 import spotipy
+from sklearn.neighbors import NearestNeighbors
 from spotipy.oauth2 import SpotifyClientCredentials
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
@@ -7,6 +8,8 @@ import seaborn as sns
 import plotly.graph_objs as go
 from yellowbrick.cluster import KElbowVisualizer
 from sklearn.cluster import KMeans
+import random
+import math
 
 
 # YOUR spotify data
@@ -17,7 +20,7 @@ from sklearn.cluster import KMeans
 #         client_secret=SECRET))
 
 
-def run_spotifyForDev(client_id, client_secret):
+def run_spotify_for_dev(client_id, client_secret):
     """
     Runs spotify for the developers. You have to enter your own id and secret
     :param client_id: id
@@ -98,8 +101,8 @@ def create_feature_dataset(all_playlists_IDList: list, spotify: spotipy.Spotify)
 
         # we have the playlist and have to create the list of tracks IDs of that specific playlist
         tracksIDs: list = playlist_tracks_IDList_generator(playlist_ID, spotify)
-        # iterate thru the list of track IDs and generate each feature
 
+        # iterate thru the list of track IDs and generate each feature
         for trackID in tracksIDs:
             try:
                 feat_dict = spotify.audio_features(trackID)
@@ -114,10 +117,39 @@ def create_feature_dataset(all_playlists_IDList: list, spotify: spotipy.Spotify)
                 continue
 
     final_df.set_index('id', inplace=True)
+
     # remove duplicates from the dataframe
     final_df.drop_duplicates(keep='last', inplace=True)
+
     return final_df
 
+
+def create_feature_dataset_user(user_playlist_IDList: list, spotify: spotipy.Spotify):
+    """
+    copy of the above function except it takes directly a playlist as input
+    :param user_playlist_IDList: List of all IDs for the user id
+    :param spotify: Spotify
+    :return: dataframe of songs and their features collected from the user input
+    """
+    final_df = pd.DataFrame({})
+
+    # iterate thru the list of track IDs and generate each feature
+    for trackID in user_playlist_IDList:
+        try:
+            feat_dict = spotify.audio_features(trackID)
+            coln = pd.DataFrame(feat_dict)
+            coln.drop('analysis_url', axis=1, inplace=True)
+            coln.drop('track_href', axis=1, inplace=True)
+            coln.drop('uri', axis=1, inplace=True)
+            coln.drop('type', axis=1, inplace=True)
+            final_df = pd.concat([final_df, coln], ignore_index=True)
+        # for songs that don't work
+        except:
+            continue
+
+    final_df.set_index('id', inplace=True)
+
+    return final_df
 
 def merge_UserInput_with_SourceDF(user_df: pd.DataFrame, source_df: pd.DataFrame):
     """
@@ -147,6 +179,19 @@ def generate_csvFile_for_sourceData(feature_df):
     """
     feature_df.to_csv('data.csv')
     return
+
+
+def merge_UserInput_with_sourceCSV(source_csv : str, user_csv: str):
+    '''
+    read: merges two csv files instead of two pd dataframes
+    :param source_csv:
+    :param user_csv:
+    :return:
+    '''
+    source_df = pd.read_csv(source_csv)
+    user_df = pd.read_csv(user_csv)
+    return pd.concat([source_df, user_df]).to_csv('test_data.csv', index =False)
+
 
 
 def show_visualized_elbow(file_name=None, data_frame=None):
@@ -282,7 +327,7 @@ def get_cluster_user(model: KMeans, num_clusters: int, dataframe: pd.DataFrame, 
     for i in range(num_clusters):
         d[i] = []
 
-    #list of clusters for each user song
+    # list of clusters for each user song
     cluster = model.labels_[user_start_index: len(dataframe)]
 
     for i in range(len(cluster)):
@@ -290,6 +335,35 @@ def get_cluster_user(model: KMeans, num_clusters: int, dataframe: pd.DataFrame, 
         d[cluster[i]].append((id, i+user_start_index))
 
     return d
+
+
+def random_suggestion_generator(user_cluster: dict, data_cluster: dict):
+    '''
+    generates a random suggestion of 50 songs based on the ratio of tracks from the input
+    playlist in a cluster
+    :param user_cluster: dict mapping clusters to a list of tuples (song_id, index)
+    from dataset in that cluster from the user
+    :param data_cluster: similar to user_cluster but for training dataset
+    :return: list of recommended song IDs
+    '''
+    rec = []
+
+    # calculate the ratio and sample the 50 songs
+    # round-up the number of songs to prevent under-counting
+    for cluster in user_cluster:
+        ratio = len(user_cluster[cluster])/len(data_cluster[cluster])
+        songs_per_cluster = math.ceil(ratio*50)
+        rec.append(random.sample(data_cluster[cluster], songs_per_cluster))
+
+    # verify we have 50 songs
+    if len(rec) != 50:
+        rec = rec[:49]
+
+    # modify the list to return IDs
+    for i in range(len(rec)):
+        rec[i] = rec[i][0]
+
+    return rec
 
 
 def KNN_models(cluster_list: dict, dataframe: pd.DataFrame):
@@ -323,7 +397,7 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
     songs are tuples where the first element is the distance from the user song
     the second element is the index of the song relative to its position in the cluster_list from the prev function
     :param models: dict mapping clusters to NearestNeighbor object
-    :param cluster_list: dictionary that maps cluster numbers to tuples of
+    :param cluster_user_list: dictionary that maps cluster numbers to tuples of
     ids and indices of the user songs
     :param dataframe: mixed dataframe
     :param user_start_index: index of first user song in mixed dataframe
@@ -343,7 +417,7 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
             pred_tup = pred[0][0][0], pred[1][0][0]
             i = 1 # keeps track of the neighbor we look at
 
-            #check for duplicates
+            # check for duplicates
             while pred_tup[1] in songs_indices_added:
                 pred_tup = pred[0][0][i], pred[1][0][i]
                 i += 1
@@ -351,12 +425,12 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
             neighbors[cluster].append(pred_tup)
             songs_indices_added.append(pred_tup[1])
 
-    #sort calculate ratios
+    # sort calculate ratios
     n = len(dataframe) - user_start_index
 
     for cluster in neighbors:
         neighbors[cluster].sort()
-        #check that this always outputs 50 songs
+        # check that this always outputs 50 songs
         songs_per_cluster = int(round((len(neighbors[cluster])/n)*50, 0))
         neighbors[cluster] = neighbors[cluster][:songs_per_cluster]
 
@@ -381,5 +455,5 @@ def generate_recommendation_ids(rec_list: dict, cluster_dataset: dict):
 
 """
 a function that creates a spotify playlist using the API given the list of 50 track ids.
-we have to add picture and disctiption to the playlist as well!
+we have to add picture and description to the playlist as well!
 """
