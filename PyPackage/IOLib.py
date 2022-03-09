@@ -1,5 +1,6 @@
 import pandas as pd
 import spotipy
+from sklearn.neighbors import NearestNeighbors
 from spotipy.oauth2 import SpotifyClientCredentials
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
@@ -282,12 +283,12 @@ def get_cluster_user(model: KMeans, num_clusters: int, dataframe: pd.DataFrame, 
     for i in range(num_clusters):
         d[i] = []
 
-    #list of clusters for each user song
+    # list of clusters for each user song
     cluster = model.labels_[user_start_index: len(dataframe)]
 
     for i in range(len(cluster)):
-        id = dataframe.index[i+user_start_index]
-        d[cluster[i]].append((id, i+user_start_index))
+        id = dataframe.index[i + user_start_index]
+        d[cluster[i]].append((id, i + user_start_index))
 
     return d
 
@@ -304,11 +305,11 @@ def KNN_models(cluster_list: dict, dataframe: pd.DataFrame):
     models = dict.fromkeys(keys)
 
     for cluster in cluster_list:
-        #we want all neighbors
+        # we want all neighbors
         neigh = NearestNeighbors(n_neighbors=len(cluster_list[cluster]))
         indices = [index for id, index in cluster_list[cluster]]
 
-        #dataframe with just rows of songs in the cluster
+        # dataframe with just rows of songs in the cluster
         model = neigh.fit(dataframe.iloc[indices, :].values)
         models[cluster] = model
 
@@ -322,9 +323,9 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
     the number of songs per cluster depends on the ratio of user songs in each cluster
     songs are tuples where the first element is the distance from the user song
     the second element is the index of the song relative to its position in the cluster_list from the prev function
-    :param models: dict mapping clusters to NearestNeighbor object
-    :param cluster_list: dictionary that maps cluster numbers to tuples of
+    :param cluster_user_list: dictionary that maps cluster numbers to tuples of
     ids and indices of the user songs
+    :param models: dict mapping clusters to NearestNeighbor object
     :param dataframe: mixed dataframe
     :param user_start_index: index of first user song in mixed dataframe
     :return: dict mapping clusters to list of recommendations as a tuple
@@ -341,9 +342,9 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
         for i in indices:
             pred = models[cluster].kneighbors([dataframe.iloc[i]], return_distance=True)
             pred_tup = pred[0][0][0], pred[1][0][0]
-            i = 1 # keeps track of the neighbor we look at
+            i = 1  # keeps track of the neighbor we look at
 
-            #check for duplicates
+            # check for duplicates
             while pred_tup[1] in songs_indices_added:
                 pred_tup = pred[0][0][i], pred[1][0][i]
                 i += 1
@@ -351,13 +352,13 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
             neighbors[cluster].append(pred_tup)
             songs_indices_added.append(pred_tup[1])
 
-    #sort calculate ratios
+    # sort calculate ratios
     n = len(dataframe) - user_start_index
 
     for cluster in neighbors:
         neighbors[cluster].sort()
-        #check that this always outputs 50 songs
-        songs_per_cluster = int(round((len(neighbors[cluster])/n)*50, 0))
+        # check that this always outputs 50 songs
+        songs_per_cluster = int(round((len(neighbors[cluster]) / n) * 50, 0))
         neighbors[cluster] = neighbors[cluster][:songs_per_cluster]
 
     return neighbors
