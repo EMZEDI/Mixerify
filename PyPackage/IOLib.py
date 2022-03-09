@@ -304,13 +304,12 @@ def KNN_models(cluster_list: dict, dataframe: pd.DataFrame):
     models = dict.fromkeys(keys)
 
     for cluster in cluster_list:
-        neigh = NearestNeighbors(n_neighbors=1)
-        
-        #indices of songs in the cluster
+        #we want all neighbors
+        neigh = NearestNeighbors(n_neighbors=len(cluster_list[cluster]))
         indices = [index for id, index in cluster_list[cluster]]
 
-        #fitting model using appropriate rows in the df
-        model = neigh.fit(dataframe.iloc[indices, :])
+        #dataframe with just rows of songs in the cluster
+        model = neigh.fit(dataframe.iloc[indices, :].values)
         models[cluster] = model
 
     return models
@@ -337,22 +336,27 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
 
     for cluster in cluster_user_list:
         indices = [index for id, index in cluster_user_list[cluster]]
+        songs_indices_added = []
 
         for i in indices:
-            #find nearest neighbor of each song in cluster
             pred = models[cluster].kneighbors([dataframe.iloc[i]], return_distance=True)
-            #make tuple
             pred_tup = pred[0][0][0], pred[1][0][0]
+            i = 1 # keeps track of the neighbor we look at
+
+            #check for duplicates
+            while pred_tup[1] in songs_indices_added:
+                pred_tup = pred[0][0][i], pred[1][0][i]
+                i += 1
+
             neighbors[cluster].append(pred_tup)
+            songs_indices_added.append(pred_tup[1])
 
-    #WE ALSO GOTTA CHECK FOR DUPLICATEs
-
-    #sort and calculate ratios
+    #sort calculate ratios
     n = len(dataframe) - user_start_index
 
     for cluster in neighbors:
         neighbors[cluster].sort()
-        #***check that this always outputs 50 songs
+        #check that this always outputs 50 songs
         songs_per_cluster = int(round((len(neighbors[cluster])/n)*50, 0))
         neighbors[cluster] = neighbors[cluster][:songs_per_cluster]
 
