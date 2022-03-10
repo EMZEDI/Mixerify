@@ -499,6 +499,14 @@ Ensure the default browser behavior of the `hidden` attribute.
   height: 8rem;
 }
 
+.h-20 {
+  height: 5rem;
+}
+
+.max-h-96 {
+  max-height: 24rem;
+}
+
 .w-full {
   width: 100%;
 }
@@ -511,6 +519,15 @@ Ensure the default browser behavior of the `hidden` attribute.
   width: 8rem;
 }
 
+.w-20 {
+  width: 5rem;
+}
+
+.columns-2 {
+  -webkit-columns: 2;
+          columns: 2;
+}
+
 .flex-col {
   flex-direction: column;
 }
@@ -521,6 +538,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .justify-center {
   justify-content: center;
+}
+
+.overflow-y-scroll {
+  overflow-y: scroll;
 }
 
 .rounded-xl {
