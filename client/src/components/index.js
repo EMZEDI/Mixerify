@@ -1,6 +1,6 @@
 export const Index = () => {
   return (
-    <div className="w-full h-full bg-gradient-to-br from-emerald-900 via-emerald-400 to-emerald-200 flex flex-col h-screen content-center justify-center text-white">
+    <div className="w-full h-screen bg-gradient-to-br from-emerald-900 via-emerald-400 to-emerald-200 flex flex-col h-screen content-center justify-center text-white">
     <div className="w-1/2 bg-gray-700 m-auto p-10 rounded-xl shadow-2xl inner">
         <div className="p-2">
           <h1 className="font-medium text-5xl">Spotify-ai</h1>
