@@ -3,7 +3,7 @@ import spotipy
 from sklearn.neighbors import NearestNeighbors
 from spotipy.oauth2 import SpotifyClientCredentials
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import seaborn as sns
 import plotly.graph_objs as go
 from yellowbrick.cluster import KElbowVisualizer
