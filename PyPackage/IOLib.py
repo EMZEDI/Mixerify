@@ -170,6 +170,18 @@ def merge_UserInput_with_SourceDF(user_df: pd.DataFrame, source_df: pd.DataFrame
     start = start - (prev_size - new_size)
     return final_df, start
 
+def normalize_dataframe(df: pd.DataFrame):
+    """
+    Normalizes the features in merged dataframe
+    :param df: merged dataframe
+    :return: merged dataframe normalized
+    """
+    scaler = MinMaxScaler()
+    normalized = scaler.fit_transform(df)
+
+    #reestablish pd dataframe (bc it is now an numpy array)
+    normalized_df = pd.DataFrame(data=normalized, index=df.index, columns=df.columns)
+    return normalized_df
 
 def generate_csvFile_for_sourceData(feature_df):
     """
@@ -403,34 +415,45 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
     :param user_start_index: index of first user song in mixed dataframe
     :return: dict mapping clusters to list of recommendations as a tuple
     """
-    neighbors = {}
+        neighbors = {}
 
     for i in range(len(cluster_user_list)):
         neighbors[i] = []
 
+    #num user songs
+    n = len(dataframe) - user_start_index
+    
+    #for playlists < 50 songs
+    recs_per_song = 1
+    if n < 50:
+        #find how many recs per song to find
+        recs_per_song = ceil(50/n)
+
     for cluster in cluster_user_list:
+        
+        #indices of user songs in cluster
         indices = [index for id, index in cluster_user_list[cluster]]
         songs_indices_added = []
 
-        for i in indices:
-            pred = models[cluster].kneighbors([dataframe.iloc[i]], return_distance=True)
-            pred_tup = pred[0][0][0], pred[1][0][0]
-            i = 1 # keeps track of the neighbor we look at
-
-            # check for duplicates
-            while pred_tup[1] in songs_indices_added:
+        for idx in indices:
+            for i in range(recs_per_song):
+                
+                pred = models[cluster].kneighbors([dataframe.iloc[idx]], return_distance=True)
                 pred_tup = pred[0][0][i], pred[1][0][i]
-                i += 1
+                j = i + 1 # keeps track of the neighbor we look at
 
-            neighbors[cluster].append(pred_tup)
-            songs_indices_added.append(pred_tup[1])
+                #check for duplicates
+                while pred_tup[1] in songs_indices_added:
+                    pred_tup = pred[0][0][j], pred[1][0][j]
+                    j += 1
 
-    # sort calculate ratios
-    n = len(dataframe) - user_start_index
+                neighbors[cluster].append(pred_tup)
+                songs_indices_added.append(pred_tup[1])
 
+    #sort & calculate ratios
     for cluster in neighbors:
         neighbors[cluster].sort()
-        # check that this always outputs 50 songs
+        #check that this always outputs 50 songs
         songs_per_cluster = int(round((len(neighbors[cluster])/n)*50, 0))
         neighbors[cluster] = neighbors[cluster][:songs_per_cluster]
 
