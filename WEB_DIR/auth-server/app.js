@@ -15,6 +15,7 @@ var cookieParser = require('cookie-parser');
 var client_id = '76f7c47fb00d4751b1c6223a1696a5d0'; // Your client id
 var client_secret = 'd27a2e69bde7486ba5d8eeb82871f1e3'; // Your secret
 var redirect_uri = 'http://localhost:8888/callback'; // Or Your redirect uri
+var PORT = process.env.PORT || 8888
 
 /**
  * Generates a random string containing numbers and letters
@@ -141,5 +142,5 @@ app.get('/refresh_token', function(req, res) {
   });
 });
 
-console.log('Listening on 8888');
-app.listen(8888);
+console.log('Listening on '+PORT);
+app.listen(PORT);

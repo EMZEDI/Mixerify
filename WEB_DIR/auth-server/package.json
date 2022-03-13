@@ -4,5 +4,8 @@
     "express": "^4.17.3",
     "querystring": "^0.2.1",
     "request": "^2.88.2"
+  },
+  "scripts": {
+    "start": "node app.js"
   }
 }
