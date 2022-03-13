@@ -429,7 +429,7 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
     recs_per_song = 1
     if n < 50:
         # find how many recs per song to find
-        recs_per_song = ceil(50 / n)
+        recs_per_song = math.ceil(50 / n)
 
     for cluster in cluster_user_list:
 

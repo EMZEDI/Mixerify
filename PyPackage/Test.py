@@ -1,9 +1,11 @@
 from IOLib import *
+import os
 
 # spotify data
-client_id = 'b33beb1ef724488e945f7e3f3479dc21'
-client_secret = '95d87eb49c204ec78c72852adf1855ad'
-REDIRECT_URI = "http://127.0.0.1:8000"
+
+client_id = os.environ.get('SPOTIPY_CLIENT_ID')
+client_secret = os.environ.get('SPOTIPY_CLIENT_SECRET')
+REDIRECT_URI = "http://127.0.0.1:8000"  # this must be changed when the website is deployed
 
 # create the authentication and redirect the user to log in
 auth = spotipy.oauth2.SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=REDIRECT_URI,
@@ -18,8 +20,7 @@ id = user_init_playlistID.replace("https://open.spotify.com/playlist/", '')
 id = id[:id.find('?')]
 user_df = create_feature_dataset([id], sp)
 # read the main dataset to recommend the songs from
-df = pd.read_pickle("dataset.pkl")
-
+df = pd.read_csv("../DATABASE/MAIS202data.csv")
 # merge user and main dataset
 output = merge_UserInput_with_SourceDF(user_df=user_df, source_df=df)
 # normalize the output
@@ -37,7 +38,7 @@ recs = generate_recommendations(models, cluster_user_list, norm, output[1])  # c
 recs_id = generate_recommendation_ids(recs, cluster_list)  # generate the ids
 
 final = []
-links = [('http://open.spotify.com/track/' + id2) for id2 in recs_id]
+links = [('https://open.spotify.com/track/' + id2) for id2 in recs_id]
 for link in links:
     final.append(link)
 
