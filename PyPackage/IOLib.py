@@ -151,6 +151,7 @@ def create_feature_dataset_user(user_playlist_IDList: list, spotify: spotipy.Spo
 
     return final_df
 
+
 def merge_UserInput_with_SourceDF(user_df: pd.DataFrame, source_df: pd.DataFrame):
     """
     Reads the user feature dataset and merges that to the end of the source dataset. Removes the duplicates
@@ -170,6 +171,7 @@ def merge_UserInput_with_SourceDF(user_df: pd.DataFrame, source_df: pd.DataFrame
     start = start - (prev_size - new_size)
     return final_df, start
 
+
 def normalize_dataframe(df: pd.DataFrame):
     """
     Normalizes the features in merged dataframe
@@ -179,9 +181,10 @@ def normalize_dataframe(df: pd.DataFrame):
     scaler = MinMaxScaler()
     normalized = scaler.fit_transform(df)
 
-    #reestablish pd dataframe (bc it is now an numpy array)
+    # reestablish pd dataframe (bc it is now an numpy array)
     normalized_df = pd.DataFrame(data=normalized, index=df.index, columns=df.columns)
     return normalized_df
+
 
 def generate_csvFile_for_sourceData(feature_df):
     """
@@ -193,7 +196,7 @@ def generate_csvFile_for_sourceData(feature_df):
     return
 
 
-def merge_UserInput_with_sourceCSV(source_csv : str, user_csv: str):
+def merge_UserInput_with_sourceCSV(source_csv: str, user_csv: str):
     '''
     read: merges two csv files instead of two pd dataframes
     :param source_csv:
@@ -202,8 +205,7 @@ def merge_UserInput_with_sourceCSV(source_csv : str, user_csv: str):
     '''
     source_df = pd.read_csv(source_csv)
     user_df = pd.read_csv(user_csv)
-    return pd.concat([source_df, user_df]).to_csv('test_data.csv', index =False)
-
+    return pd.concat([source_df, user_df]).to_csv('test_data.csv', index=False)
 
 
 def show_visualized_elbow(file_name=None, data_frame=None):
@@ -343,8 +345,8 @@ def get_cluster_user(model: KMeans, num_clusters: int, dataframe: pd.DataFrame, 
     cluster = model.labels_[user_start_index: len(dataframe)]
 
     for i in range(len(cluster)):
-        id = dataframe.index[i+user_start_index]
-        d[cluster[i]].append((id, i+user_start_index))
+        id = dataframe.index[i + user_start_index]
+        d[cluster[i]].append((id, i + user_start_index))
 
     return d
 
@@ -363,8 +365,8 @@ def random_suggestion_generator(user_cluster: dict, data_cluster: dict):
     # calculate the ratio and sample the 50 songs
     # round-up the number of songs to prevent under-counting
     for cluster in user_cluster:
-        ratio = len(user_cluster[cluster])/len(data_cluster[cluster])
-        songs_per_cluster = math.ceil(ratio*50)
+        ratio = len(user_cluster[cluster]) / len(data_cluster[cluster])
+        songs_per_cluster = math.ceil(ratio * 50)
         rec.append(random.sample(data_cluster[cluster], songs_per_cluster))
 
     # verify we have 50 songs
@@ -390,11 +392,11 @@ def KNN_models(cluster_list: dict, dataframe: pd.DataFrame):
     models = dict.fromkeys(keys)
 
     for cluster in cluster_list:
-        #we want all neighbors
+        # we want all neighbors
         neigh = NearestNeighbors(n_neighbors=len(cluster_list[cluster]))
         indices = [index for id, index in cluster_list[cluster]]
 
-        #dataframe with just rows of songs in the cluster
+        # dataframe with just rows of songs in the cluster
         model = neigh.fit(dataframe.iloc[indices, :].values)
         models[cluster] = model
 
@@ -415,34 +417,34 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
     :param user_start_index: index of first user song in mixed dataframe
     :return: dict mapping clusters to list of recommendations as a tuple
     """
-        neighbors = {}
+    neighbors = {}
 
     for i in range(len(cluster_user_list)):
         neighbors[i] = []
 
-    #num user songs
+    # num user songs
     n = len(dataframe) - user_start_index
-    
-    #for playlists < 50 songs
+
+    # for playlists < 50 songs
     recs_per_song = 1
     if n < 50:
-        #find how many recs per song to find
-        recs_per_song = ceil(50/n)
+        # find how many recs per song to find
+        recs_per_song = math.ceil(50 / n)
 
     for cluster in cluster_user_list:
-        
-        #indices of user songs in cluster
+
+        # indices of user songs in cluster
         indices = [index for id, index in cluster_user_list[cluster]]
         songs_indices_added = []
 
         for idx in indices:
             for i in range(recs_per_song):
-                
+
                 pred = models[cluster].kneighbors([dataframe.iloc[idx]], return_distance=True)
                 pred_tup = pred[0][0][i], pred[1][0][i]
-                j = i + 1 # keeps track of the neighbor we look at
+                j = i + 1  # keeps track of the neighbor we look at
 
-                #check for duplicates
+                # check for duplicates
                 while pred_tup[1] in songs_indices_added:
                     pred_tup = pred[0][0][j], pred[1][0][j]
                     j += 1
@@ -450,11 +452,11 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
                 neighbors[cluster].append(pred_tup)
                 songs_indices_added.append(pred_tup[1])
 
-    #sort & calculate ratios
+    # sort & calculate ratios
     for cluster in neighbors:
         neighbors[cluster].sort()
-        #check that this always outputs 50 songs
-        songs_per_cluster = int(round((len(neighbors[cluster])/n)*50, 0))
+        # check that this always outputs 50 songs
+        songs_per_cluster = int(round((len(neighbors[cluster]) / n) * 50, 0))
         neighbors[cluster] = neighbors[cluster][:songs_per_cluster]
 
     return neighbors
