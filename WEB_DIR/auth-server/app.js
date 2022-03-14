@@ -1,12 +1,3 @@
-/**
- * This is an example of a basic node.js script that performs
- * the Authorization Code oAuth2 flow to authenticate against
- * the Spotify Accounts.
- *
- * For more information, read
- * https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
- */
-
 var express = require("express"); // Express web server framework
 var cors = require('cors');
 var { spawn } = require("child_process");
@@ -16,22 +7,13 @@ var cookieParser = require("cookie-parser");
 
 require('dotenv').config();
 const BACKEND_URL = process.env.BACKEND_URL
+const USE_SSL = process.env.USE_SSL
 const FRONTEND_URL = process.env.FRONTEND_URL
 const CLIENT_ID = process.env.CLIENT_ID
 const CLIENT_SECRET = process.env.CLIENT_SECRET
 const REDIRECT_URI = BACKEND_URL+"/callback"; // Or Your redirect uri
 
-var fs = require('fs');
 var http = require('http');
-var https = require('https');
-// Certificate
-const certificate = fs.readFileSync('/etc/letsencrypt/live/backend.spotifyai.ml/fullchain.pem', 'utf8');
-const privateKey = fs.readFileSync('/etc/letsencrypt/live/backend.spotifyai.ml/privkey.pem', 'utf8');
-
-const credentials = {
-	key: privateKey,
-	cert: certificate
-};
 
 /**
  * Generates a random string containing numbers and letters
@@ -195,7 +177,6 @@ app.get("/refresh_token", function (req, res) {
 });
 
 const httpServer = http.createServer(app);
-const httpsServer = https.createServer(credentials, app);
 
 httpServer.listen(80, () => {
 	console.log('HTTP Server running on port 80');
@@ -203,6 +184,19 @@ httpServer.listen(80, () => {
   console.log("secret: "+CLIENT_SECRET)
 });
 
-httpsServer.listen(443, () => {
-	console.log('HTTPS Server running on port 443');
-});
+if(USE_SSL!="FALSE"){
+  var fs = require('fs');
+  var https = require('https');
+  // Certificate
+  const certificate = fs.readFileSync('/etc/letsencrypt/live/backend.spotifyai.ml/fullchain.pem', 'utf8');
+  const privateKey = fs.readFileSync('/etc/letsencrypt/live/backend.spotifyai.ml/privkey.pem', 'utf8');
+
+  const credentials = {
+    key: privateKey,
+    cert: certificate
+  };
+  const httpsServer = https.createServer(credentials, app);
+  httpsServer.listen(443, () => {
+    console.log('HTTPS Server running on port 443');
+  });
+}
