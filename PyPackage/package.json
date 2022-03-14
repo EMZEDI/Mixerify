@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "pandas": "^0.0.3"
+  }
+}

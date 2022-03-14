@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
-export const Home = ({ spotifyApi, user, setUser, playlists, setPlaylists }) => {
+export const Home = ({ spotifyApi, user, setUser, playlists, setPlaylists, token }) => {
+  const [response, setResponse] = useState("");
+  axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
   useEffect(() => {
     if (!user) {
       spotifyApi
@@ -30,6 +33,15 @@ export const Home = ({ spotifyApi, user, setUser, playlists, setPlaylists }) => 
         );
     }
   }, []);
+  const request = () => {
+    const data = { accessToken: token, playlist: "hello dummy" };
+    axios.post('http://localhost:8888/python', {}, { params: data })
+      .then(response => {
+        console.log(response);
+        setResponse(response.data.output);
+      });
+  }
+
   return (
     <div className="w-full flex text-white">
       <div className="fixed w-1/2 h-screen bg-gradient-to-br from-emerald-900 via-emerald-400 to-emerald-200 flex items-center justify-center">
@@ -42,6 +54,8 @@ export const Home = ({ spotifyApi, user, setUser, playlists, setPlaylists }) => 
               />
             </div>
             <h1 className="text-2xl">{user.display_name}</h1></>}
+            {response}
+            <a onClick={(()=>request())}>test me</a>
             <Link to="/" className="text-lg font-light text-gray-400">
               Log out
             </Link>
