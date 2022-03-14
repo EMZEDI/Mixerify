@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export const Playlist = ({ spotifyApi, token }) => {
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   const navigate = useNavigate();
   axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
   const { id } = useParams();
@@ -11,7 +12,7 @@ export const Playlist = ({ spotifyApi, token }) => {
   const request = () => {
     const data = { accessToken: token, playlist: id };
     axios
-      .post("http://localhost:8888/python", {}, { params: data })
+      .post(BACKEND_URL+"/python", {}, { params: data })
       .then((response) => {
         if(response && response.data && response.data.output && response.data.output.length == 22){
             navigate("/home/playlist/" + response.data.output);

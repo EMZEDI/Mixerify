@@ -14,10 +14,26 @@ var request = require("request"); // "Request" library
 var querystring = require("querystring");
 var cookieParser = require("cookie-parser");
 
-var client_id = "76f7c47fb00d4751b1c6223a1696a5d0"; // Your client id
-var client_secret = "d27a2e69bde7486ba5d8eeb82871f1e3"; // Your secret
-var redirect_uri = "http://localhost:8888/callback"; // Or Your redirect uri
-var PORT = process.env.PORT || 8888;
+require('dotenv').config();
+const BACKEND_URL = process.env.BACKEND_URL
+const FRONTEND_URL = process.env.FRONTEND_URL
+const CLIENT_ID = process.env.CLIENT_ID
+const CLIENT_SECRET = process.env.CLIENT_SECRET
+const REDIRECT_URI = BACKEND_URL+"/callback"; // Or Your redirect uri
+
+var fs = require('fs');
+var http = require('http');
+var https = require('https');
+// Certificate
+// const privateKey = fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/privkey.pem', 'utf8');
+// const certificate = fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/cert.pem', 'utf8');
+// const ca = fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/chain.pem', 'utf8');
+
+// const credentials = {
+// 	key: privateKey,
+// 	cert: certificate,
+// 	ca: ca
+// };
 
 /**
  * Generates a random string containing numbers and letters
@@ -77,9 +93,9 @@ app.get("/login", function (req, res) {
     "https://accounts.spotify.com/authorize?" +
       querystring.stringify({
         response_type: "code",
-        client_id: client_id,
+        client_id: CLIENT_ID,
         scope: scope,
-        redirect_uri: redirect_uri,
+        redirect_uri: REDIRECT_URI,
         state: state,
       })
   );
@@ -106,13 +122,13 @@ app.get("/callback", function (req, res) {
       url: "https://accounts.spotify.com/api/token",
       form: {
         code: code,
-        redirect_uri: redirect_uri,
+        redirect_uri: REDIRECT_URI,
         grant_type: "authorization_code",
       },
       headers: {
         Authorization:
           "Basic " +
-          new Buffer(client_id + ":" + client_secret).toString("base64"),
+          new Buffer(CLIENT_ID + ":" + CLIENT_SECRET).toString("base64"),
       },
       json: true,
     };
@@ -135,7 +151,7 @@ app.get("/callback", function (req, res) {
 
         // we can also pass the token to the browser to make requests from there
         res.redirect(
-          "http://localhost:3000/auth/#" +
+          FRONTEND_URL+"/auth/#" +
             querystring.stringify({
               access_token: access_token,
               refresh_token: refresh_token,
@@ -161,7 +177,7 @@ app.get("/refresh_token", function (req, res) {
     headers: {
       Authorization:
         "Basic " +
-        new Buffer(client_id + ":" + client_secret).toString("base64"),
+        new Buffer(CLIENT_ID + ":" + CLIENT_SECRET).toString("base64"),
     },
     form: {
       grant_type: "refresh_token",
@@ -180,5 +196,13 @@ app.get("/refresh_token", function (req, res) {
   });
 });
 
-console.log("Listening on " + PORT);
-app.listen(PORT);
+const httpServer = http.createServer(app);
+// const httpsServer = https.createServer(credentials, app);
+
+httpServer.listen(80, () => {
+	console.log('HTTP Server running on port 80');
+});
+
+// httpsServer.listen(443, () => {
+// 	console.log('HTTPS Server running on port 443');
+// });

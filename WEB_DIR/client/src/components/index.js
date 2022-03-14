@@ -1,4 +1,5 @@
 export const Index = () => {
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   return (
     <div className="w-full h-screen bg-gradient-to-br from-emerald-900 via-emerald-400 to-emerald-200 flex flex-col h-screen content-center justify-center text-white">
     <div className="w-1/2 bg-gray-700 m-auto p-10 rounded-xl shadow-2xl inner">
@@ -11,7 +12,7 @@ export const Index = () => {
         <div className="p-2">
           <a
             className="transition-all px-6 py-2 mt-4 text-white bg-emerald-600 rounded-lg hover:bg-emerald-500"
-            href="http://localhost:8888/login"
+            href={BACKEND_URL+"/login"}
             rel="noopener noreferrer"
           >
             Login
