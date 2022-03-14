@@ -35,7 +35,7 @@ sp = spotipy.Spotify(auth=TOKEN)
 current = sp.playlist(ID)['name']
 
 playlist = sp.user_playlist_create(sp.me()['id'], name=current+" AI Remix")
-print(playlist['id'])
+print(playlist['id'],end="")
 # print("created the playlist for the user init")
 
 df = pd.read_pickle(URL_MODIFIER+"dataset.pkl")

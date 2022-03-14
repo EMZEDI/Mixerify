@@ -503,6 +503,18 @@ Ensure the default browser behavior of the `hidden` attribute.
   margin-right: auto;
 }
 
+.ml-4 {
+  margin-left: 1rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
 .ml-2 {
   margin-left: 0.5rem;
 }
@@ -513,14 +525,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .mt-4 {
   margin-top: 1rem;
-}
-
-.ml-4 {
-  margin-left: 1rem;
-}
-
-.mb-4 {
-  margin-bottom: 1rem;
 }
 
 .mr-10 {
@@ -549,6 +553,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .h-screen {
   height: 100vh;
+}
+
+.h-64 {
+  height: 16rem;
 }
 
 .h-32 {
@@ -587,6 +595,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   width: 100%;
 }
 
+.w-64 {
+  width: 16rem;
+}
+
 .w-1\/2 {
   width: 50%;
 }
@@ -605,6 +617,25 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .w-16 {
   width: 4rem;
+}
+
+@-webkit-keyframes spin {
+  to {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  to {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  -webkit-animation: spin 1s linear infinite;
+          animation: spin 1s linear infinite;
 }
 
 .cursor-pointer {
@@ -707,6 +738,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .fill-emerald-400 {
   fill: #34d399;
+}
+
+.fill-blue-600 {
+  fill: #2563eb;
 }
 
 .p-8 {
@@ -814,6 +849,11 @@ Ensure the default browser behavior of the `hidden` attribute.
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
+.text-gray-200 {
+  --tw-text-opacity: 1;
+  color: rgb(229 231 235 / var(--tw-text-opacity));
+}
+
 .text-gray-400 {
   --tw-text-opacity: 1;
   color: rgb(156 163 175 / var(--tw-text-opacity));
@@ -857,6 +897,42 @@ Ensure the default browser behavior of the `hidden` attribute.
   transition: all 1s;
 }
 
+body {
+  background: linear-gradient(-45deg, #064e3b, #34d399, #16a34a);
+  background-size: 400% 400%;
+  -webkit-animation: gradient 5s ease-in-out infinite;
+          animation: gradient 5s ease-in-out infinite;
+  height: 100vh;
+}
+
+@-webkit-keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 .hover\:bg-emerald-400:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(52 211 153 / var(--tw-bg-opacity));
@@ -865,4 +941,11 @@ Ensure the default browser behavior of the `hidden` attribute.
 .hover\:bg-emerald-500:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(16 185 129 / var(--tw-bg-opacity));
+}
+
+@media (prefers-color-scheme: dark) {
+  .dark\:text-gray-600 {
+    --tw-text-opacity: 1;
+    color: rgb(75 85 99 / var(--tw-text-opacity));
+  }
 }
