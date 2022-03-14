@@ -199,6 +199,8 @@ const httpsServer = https.createServer(credentials, app);
 
 httpServer.listen(80, () => {
 	console.log('HTTP Server running on port 80');
+  console.log("id: "+CLIENT_ID)
+  console.log("secret: "+CLIENT_SECRET)
 });
 
 httpsServer.listen(443, () => {
