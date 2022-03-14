@@ -46,7 +46,7 @@ export const Home = ({
                 <div className="flex justify-center">
                   <img
                     className="shadow-lg w-32 h-32 rounded-full mx-auto mx-auto absolute -top-20"
-                    src={user.images[0].url}
+                    src={user.images.length>0 && user.images[0].url}
                   />
                 </div>
                 <h1 className="text-2xl">{user.display_name}</h1>
