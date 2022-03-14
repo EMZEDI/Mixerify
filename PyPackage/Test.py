@@ -21,13 +21,14 @@ playlist = sp.user_playlist_create(sp.me()['id'], name="Personalized playlist AI
 
 # get the user entered playlist data
 id = "3J4cvaaBSToZAqTNenBvD7"
+
+
+
+
 user_df = create_feature_dataset([id], sp)
-user_df.to_pickle("../DATABASE/user.pkl")
-user_df = pd.read_pickle("../DATABASE/user.pkl")
 # read the main dataset to recommend the songs from
-df = pd.read_csv("../DATABASE/MAIS202data.csv")
-df.to_pickle("../DATABASE/main.pkl")
 df = pd.read_pickle("../DATABASE/main.pkl")
+
 # merge user and main dataset
 output = merge_UserInput_with_SourceDF(user_df=user_df, source_df=df)
 # normalize the output
@@ -45,7 +46,7 @@ recs = generate_recommendations(models, cluster_user_list, norm, output[1])  # c
 recs_id = generate_recommendation_ids(recs, cluster_list)  # generate the ids
 
 final = []
-links = [('https://open.spotify.com/track/' + id2) for id2 in recs_id]
+links = [('http://open.spotify.com/track/' + id2) for id2 in recs_id]
 for link in links:
     final.append(link)
 
