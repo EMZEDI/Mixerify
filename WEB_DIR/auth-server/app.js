@@ -50,8 +50,11 @@ app.post("/python", (req, res) => {
   console.log("requested on playlist "+playlist)
   var dataToSend;
   // spawn new child process to call the python script
-  const python = spawn("python", ["../../PyPackage/Test.py",token,playlist]);
+  const python = spawn("python3", ["../../PyPackage/Test.py",token,playlist]);
   // collect data from script
+  python.stderr.on("data", function (data){
+    console.log(data.toString())
+  })
   python.stdout.on("data", function (data) {
     console.log("Pipe data from python script ...");
     dataToSend = data.toString();

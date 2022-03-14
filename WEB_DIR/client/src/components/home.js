@@ -34,7 +34,7 @@ export const Home = ({ spotifyApi, user, setUser, playlists, setPlaylists, token
     }
   }, []);
   const request = () => {
-    const data = { accessToken: token, playlist: "hello dummy" };
+    const data = { accessToken: token, playlist: "3J4cvaaBSToZAqTNenBvD7" };
     axios.post('http://localhost:8888/python', {}, { params: data })
       .then(response => {
         console.log(response);
