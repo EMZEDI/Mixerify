@@ -38,6 +38,7 @@ export const Playlist = ( { spotifyApi } ) => {
   <div className="shadow-xl bg-gray-700 p-12 text-white w-full min-h-screen">
       <div className="ml-4 space-y-2 mb-4">
       <Link className="text-emerald-400 mb-4 block text-xl" to='/home'>&larr; Back Home</Link>
+      <h1 className="text-4xl py-4">Your playlist has been generated!</h1>
       {playlistD && (<>
       <div className="flex items-center">
         {playlistD.images.length > 0 && (
