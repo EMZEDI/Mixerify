@@ -25,8 +25,8 @@ var fs = require('fs');
 var http = require('http');
 var https = require('https');
 // Certificate
-const privateKey = fs.readFileSync('/etc/letsencrypt/live/backend.spotifyai.ml/fullchain.pem', 'utf8');
-const certificate = fs.readFileSync('/etc/letsencrypt/live/backend.spotifyai.ml/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/backend.spotifyai.ml/fullchain.pem', 'utf8');
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/backend.spotifyai.ml/privkey.pem', 'utf8');
 
 const credentials = {
 	key: privateKey,
