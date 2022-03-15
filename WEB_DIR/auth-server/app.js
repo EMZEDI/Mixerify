@@ -1,17 +1,18 @@
-var express = require("express"); // Express web server framework
+var express = require("express");
 var cors = require('cors');
 var { spawn } = require("child_process");
-var request = require("request"); // "Request" library
+var request = require("request");
 var querystring = require("querystring");
 var cookieParser = require("cookie-parser");
 
+// load in environment variables
 require('dotenv').config();
 const BACKEND_URL = process.env.BACKEND_URL
 const USE_SSL = process.env.USE_SSL
 const FRONTEND_URL = process.env.FRONTEND_URL
 const CLIENT_ID = process.env.CLIENT_ID
 const CLIENT_SECRET = process.env.CLIENT_SECRET
-const REDIRECT_URI = BACKEND_URL+"/callback"; // Or Your redirect uri
+const REDIRECT_URI = BACKEND_URL+"/callback";
 
 var http = require('http');
 
@@ -39,6 +40,7 @@ app.use(cors());
 
 app.use(express.static(__dirname + "/public")).use(cookieParser());
 
+// run ML, takes in user token and playlist ID
 app.post("/python", (req, res) => {
   const token = req.query.accessToken;
   const playlist = req.query.playlist;
@@ -47,10 +49,11 @@ app.post("/python", (req, res) => {
   var dataToSend;
   // spawn new child process to call the python script
   const python = spawn("python3", ["../../PyPackage/Test.py",token,playlist]);
-  // collect data from script
+  // log error to console
   python.stderr.on("data", function (data){
     console.log(data.toString())
   })
+  // collect data from script
   python.stdout.on("data", function (data) {
     console.log("Pipe data from python script ...");
     dataToSend = data.toString();
@@ -58,16 +61,15 @@ app.post("/python", (req, res) => {
   // in close event we are sure that stream from child process is closed
   python.on("close", (code) => {
     console.log(`child process close all stdio with code ${code}`);
-    // send data to browser
+    // send data to browser (should be playlist ID)
     res.json({output : dataToSend});
   });
 });
 
+// login with spotify api
 app.get("/login", function (req, res) {
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
-
-  // your application requests authorization
   var scope = "user-read-private user-read-email user-read-playback-state user-library-modify playlist-modify-public";
   res.redirect(
     "https://accounts.spotify.com/authorize?" +
@@ -176,6 +178,7 @@ app.get("/refresh_token", function (req, res) {
   });
 });
 
+// start http server on port 80
 const httpServer = http.createServer(app);
 
 httpServer.listen(80, () => {
@@ -184,10 +187,11 @@ httpServer.listen(80, () => {
   console.log("secret: "+CLIENT_SECRET)
 });
 
+// if SSL enabled start HTTPS server
 if(USE_SSL!="FALSE"){
   var fs = require('fs');
   var https = require('https');
-  // Certificate
+  // letsencrypt cert
   const certificate = fs.readFileSync('/etc/letsencrypt/live/backend.spotifyai.ml/fullchain.pem', 'utf8');
   const privateKey = fs.readFileSync('/etc/letsencrypt/live/backend.spotifyai.ml/privkey.pem', 'utf8');
 
