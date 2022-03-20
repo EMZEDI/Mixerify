@@ -111,7 +111,7 @@ export const Playlist = ({ spotifyApi }) => {
                   </div>
                 ))}
             </div>
-            {playlistTracks && playlistTracks.items.length > 20 && (
+            {playlistD && playlistTracks && playlistTracks.items.length > 20 && (
               <div className="text-center p-8">
                 <p className="text-center p-8 pt-3">
                   To see more songs, open on Spotify.

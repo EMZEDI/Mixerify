@@ -21,9 +21,7 @@
   "scripts": {
     "start": "npm run watch:css && react-scripts start",
     "watch:css": "npx tailwindcss -i src/App.css -o src/App-compiled.css",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "build": "npm run watch:css && react-scripts build"
   },
   "eslintConfig": {
     "extends": [
