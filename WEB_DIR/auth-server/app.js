@@ -192,8 +192,8 @@ if(USE_SSL!="FALSE"){
   var fs = require('fs');
   var https = require('https');
   // letsencrypt cert
-  const certificate = fs.readFileSync('/etc/letsencrypt/live/backend.spotifyai.ml/fullchain.pem', 'utf8');
-  const privateKey = fs.readFileSync('/etc/letsencrypt/live/backend.spotifyai.ml/privkey.pem', 'utf8');
+  const certificate = fs.readFileSync('/etc/letsencrypt/live/backend.mixerify.ml/fullchain.pem', 'utf8');
+  const privateKey = fs.readFileSync('/etc/letsencrypt/live/backend.mixerify.ml/privkey.pem', 'utf8');
 
   const credentials = {
     key: privateKey,
