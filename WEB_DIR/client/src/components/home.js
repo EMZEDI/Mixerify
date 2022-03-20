@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import spotify from "../Spotify_Logo_RGB_White.png"
 
 export const Home = ({
   spotifyApi,
@@ -61,10 +62,11 @@ export const Home = ({
       </div>
       <div className="w-1/2"></div>
       <div className="w-1/2 bg-gray-700 h-screen max-h-screen overflow-hidden">
-        <h3 className="text-4xl p-16 pb-4 ml-2 font-semibold">
+      <img className="w-80 p-20 pl-16 pb-2" src={spotify} />
+        <h3 className="text-4xl p-16 pt-0 pb-4 ml-2 font-semibold">
           Select a playlist to remix:
         </h3>
-        <div className="overflow-scroll h-full p-16 pt-0 pb-40">
+        <div className="overflow-scroll h-full p-16 pt-0 pb-48">
           {playlists && (
             <div>
               <div>
