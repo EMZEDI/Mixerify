@@ -1,4 +1,4 @@
-import Index from "./components";
+import Login from "./components/login";
 import Home from "./components/home";
 import { BrowserRouter, Route, Routes} from 'react-router-dom'
 import './App-compiled.css';
@@ -16,7 +16,7 @@ function App() {
   return (
         <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index setUser={setUser} setToken={setToken} setPlaylists={setPlaylists} spotifyApi={spotifyApi}/>}/>
+          <Route path="/" element={<Login setUser={setUser} setToken={setToken} setPlaylists={setPlaylists} spotifyApi={spotifyApi}/>}/>
           <Route path="/auth" element={<Auth setToken={setToken} spotifyApi={spotifyApi}/>}/>
           <Route path="/home" element={<Home user={user} setUser={setUser} playlists={playlists} setPlaylists={setPlaylists} spotifyApi={spotifyApi} token={token}/>} />
           <Route path="/home/playlist/:id" element={<Playlist spotifyApi={spotifyApi}/>} />

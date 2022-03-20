@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export const Index = () => {
+export const Login = () => {
   const [about, setAbout] = useState(false);
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   return (
@@ -35,11 +35,11 @@ export const Index = () => {
         </div>
         <div className="text-center mt-6">
           <p className="text-md mb-3 text-gray-100">Built by Tristan, Shahrad, Emma and Hannah.</p>
-      <a href="https://github.com/tvut/wordle" className="text-5xl text-white hover:text-gray-600 transition-all"><i className="not-italic fa-brands fa-github"></i></a>
+      <a href="https://github.com/EMZEDI/MusicPlaylistGeneratorAIModel" className="text-5xl text-white hover:text-gray-600 transition-all"><i className="not-italic fa-brands fa-github"></i></a>
       </div>
       </div>
         </div>
   );
 };
 
-export default Index;
+export default Login;
