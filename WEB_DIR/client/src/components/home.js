@@ -13,7 +13,7 @@ export const Home = ({
   useEffect(() => {
     if (!user) {
       spotifyApi
-        .getMe() // note that we don't pass a user id
+        .getMe()
         .then(
           function (data) {
             setUser(data);
@@ -25,7 +25,7 @@ export const Home = ({
         );
     }
     spotifyApi
-      .getUserPlaylists() // note that we don't pass a user id
+      .getUserPlaylists()
       .then(
         function (data) {
           // console.log(data.items);
