@@ -14,7 +14,7 @@ export const Login = () => {
           {!about ? (<p>This web app will allow you to remix your Spotify playlists using our custom built AI. Simply log in with your Spotify account, click on one of your playlists, and we'll handle the rest!</p>) :
           (
             <div className="space-y-2">
-              <p>This project takes advantage of Python machine learning. Backend was developed by Shahrad, Emma and Hannah.</p>
+              <p>This project takes advantage of Python machine learning. Backend was developed by Shahrad, Emma and Hanna.</p>
               <p>The front end is built in React.js with Tailwind with authentication and machine learning Python scripts run using a backend server built with Express. Front end and Express backend were built by Tristan.</p>
               <p>All code is available on the GitHub repo, linked below.</p>
             </div>
@@ -34,7 +34,7 @@ export const Login = () => {
         </div>
         </div>
         <div className="text-center mt-6">
-          <p className="text-md mb-3 text-gray-100">Built by Tristan, Shahrad, Emma and Hannah.</p>
+          <p className="text-md mb-3 text-gray-100">Built by Tristan, Shahrad, Emma and Hanna.</p>
       <a href="https://github.com/EMZEDI/MusicPlaylistGeneratorAIModel" className="text-5xl text-white hover:text-gray-600 transition-all"><i className="not-italic fa-brands fa-github"></i></a>
       </div>
       </div>
