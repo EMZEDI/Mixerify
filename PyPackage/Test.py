@@ -39,7 +39,7 @@ model = create_cluster_for_mixed_data(num, norm_out)  # KMeans model
 cluster_list = get_cluster_dataset(model, num, norm_out, output[1])  # dict of clusters of whole thing
 cluster_user_list = get_cluster_user(model, num, norm_out, output[1])  # dict of clusters of only user
 # print("got cluster list")
-models = KNN_models(cluster_list, norm_out)  # KNN models
+models = KNN_models(cluster_list, norm_out[:output[1])  # KNN models
 # print("made KNN models")
 recs = generate_recommendations(models, cluster_user_list, norm_out, output[1])
 # print(recs)
