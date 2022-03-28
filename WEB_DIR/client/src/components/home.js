@@ -76,7 +76,6 @@ export const Home = ({
                         <h3 className="text-lg md:text-3xl">{p.name}</h3>
                         <h4>{p.description}</h4>
                         <h4>{p.tracks.total} songs</h4>
-                        <p className="text-gray-500">{p.id}</p>
                       </div>
                     </div>
                   </Link>
