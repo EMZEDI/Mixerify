@@ -62,7 +62,7 @@ export const Home = ({
         <h3 className="text-xl md: text-2xl lg:text-4xl md:p-8 xl:p-16 md:pt-0 md:pb-4 ml-2 xl:py-2 font-semibold">
           Select a playlist to remix:
         </h3>
-        <div className="md:overflow-scroll md:h-full md:p-6 xl:p-16 md:pt-0 xl:pt-0 md:pb-48 xl:pb-48">
+        <div className="md:overflow-scroll md:h-full md:p-6 xl:p-16 md:pt-0 xl:pt-0 md:pb-48 xl:pb-64">
           {playlists && (
             <div>
               <div>
