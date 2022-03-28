@@ -30,7 +30,7 @@ export const Playlist = ({ spotifyApi, token }) => {
   //   console.log(playlist.items)
   return (
     <div className="min-h-screen changingbg flex items-center justify-center">
-      <div className="shadow-4xl bg-gray-700 text-center rounded-3xl shadow-lg p-10 pt-16 relative">
+      <div className="bg-gray-700 text-center rounded-3xl md:shadow-lg p-10 pt-16 relative">
         <div className="space-y-6">
           {loading ? (
             <div>
