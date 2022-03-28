@@ -4,9 +4,9 @@ export const Login = () => {
   const [about, setAbout] = useState(false);
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   return (
-    <div className="w-full h-screen bg-gradient-to-br from-emerald-900 via-emerald-400 to-emerald-200 flex flex-col h-screen content-center justify-center text-white">
+    <div className="w-full bg-gray-700 sm:bg-gradient-to-br sm:from-emerald-900 sm:via-emerald-400 sm:to-emerald-200 flex flex-col min-h-screen sm:content-center justify-center text-white">
     <div>
-    <div className="w-1/2 bg-gray-700 m-auto p-10 rounded-xl shadow-2xl inner">
+    <div className="md:w-1/2 bg-gray-700 m-auto p-10 sm:rounded-xl shadow-2xl inner">
         <div className="p-2">
           <h1 className="font-medium text-5xl">Mixerify</h1>
         </div>
