@@ -39,8 +39,8 @@ export const Home = ({
 
   return (
     <div className="w-full flex text-white">
-      <div className="fixed w-1/2 h-screen bg-gradient-to-br from-emerald-900 via-emerald-400 to-emerald-200 flex items-center justify-center">
-        <div className="w-1/2">
+      <div className="md:fixed md:w-1/2 h-screen bg-gradient-to-br from-emerald-900 via-emerald-400 to-emerald-200 flex items-center justify-center">
+        <div className="md:w-1/2">
           <div className="shadow-4xl bg-gray-700 font-semibold text-center rounded-3xl shadow-lg p-8 pt-16 relative">
             {user && (
               <>
@@ -60,7 +60,7 @@ export const Home = ({
           </div>
         </div>
       </div>
-      <div className="w-1/2"></div>
+      <div className="invisible md:visible w-1/2"></div>
       <div className="w-1/2 bg-gray-700 h-screen max-h-screen overflow-hidden">
       <img className="w-80 p-20 pl-16 pb-2" src={spotify} />
         <h3 className="text-4xl p-16 pt-0 pb-4 ml-2 font-semibold">
