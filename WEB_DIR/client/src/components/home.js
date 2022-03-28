@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import spotify from "../Spotify_Logo_RGB_White.png";
 
 export const Home = ({
@@ -22,7 +22,9 @@ export const Home = ({
         }
       );
     }
-    spotifyApi.getUserPlaylists().then(
+    spotifyApi.getUserPlaylists({
+      limit:50
+    }).then(
       function (data) {
         // console.log(data.items);
         setPlaylists(data);
@@ -31,7 +33,7 @@ export const Home = ({
         console.error(err);
       }
     );
-  }, []);
+  }, [setPlaylists, setUser, spotifyApi, user]);
 
   return (
     <div className="w-full md:flex text-white">
@@ -42,6 +44,7 @@ export const Home = ({
               <>
                 <div className="flex justify-center">
                   <img
+                    alt="Profile"
                     className="shadow-lg h-16 h-16 md:w-32 md:h-32 rounded-full mx-auto mx-auto md:absolute md:-top-20"
                     src={user.images.length > 0 && user.images[0].url}
                   />
@@ -58,7 +61,7 @@ export const Home = ({
       </div>
       <div className="invisible md:visible w-1/2"></div>
       <div className="p-4 md:p-0 md:w-1/2 bg-gray-700 md:h-screen md:max-h-screen md:overflow-hidden">
-        <img className="w-32 ml-2 mb-2 md:md-0 md:ml-0 md:w-60 xl:w-80 md:p-10 xl:p-20 md:pl-8 xl:pl-16 xl:pb-2 md:pb-2" src={spotify} />
+        <img alt="Spotify" className="w-32 ml-2 mb-2 md:md-0 md:ml-0 md:w-60 xl:w-80 md:p-10 xl:p-20 md:pl-8 xl:pl-16 xl:pb-2 md:pb-2" src={spotify} />
         <h3 className="text-xl md: text-2xl lg:text-4xl md:p-8 xl:p-16 md:pt-0 md:pb-4 ml-2 xl:py-2 font-semibold">
           Select a playlist to remix:
         </h3>
@@ -70,7 +73,7 @@ export const Home = ({
                   <Link key={p.id} to={`generate/${p.id}`}>
                     <div className="p-2 md:p-4 flex items-center hover:bg-emerald-400 rounded-md transition-all cursor-pointer">
                       {p.images.length > 0 && (
-                        <img className="w-16 h-16 md:w-24 md:h-24 lg:w-36 lg:h-36 mr-3 lg:mr-8" src={p.images[0].url} />
+                        <img alt="Playlist Art" className="w-16 h-16 md:w-24 md:h-24 lg:w-36 lg:h-36 mr-3 lg:mr-8" src={p.images[0].url} />
                       )}
                       <div>
                         <h3 className="text-lg md:text-3xl">{p.name}</h3>

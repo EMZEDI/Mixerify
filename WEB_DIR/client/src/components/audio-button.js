@@ -18,10 +18,10 @@ export const AudioButton = ({audio}) =>  {
         return () => {
           song.removeEventListener('ended', () => setPlayingV(false));
         };
-      }, []);
+      }, [song]);
 
     return(
-        <a onClick={(() => setPlaying())}>
+        <button onClick={(() => setPlaying())}>
             {playing ? (
                 <svg className="h-6 w-6 fill-emerald-400" viewBox="0 0 60 60">
                 <polygon points="0,0 15,0 15,60 0,60" />
@@ -32,7 +32,7 @@ export const AudioButton = ({audio}) =>  {
                 <polygon points="0,0 50,30 0,60" />
                 </svg>
             )}
-        </a>
+        </button>
     )
 }
 

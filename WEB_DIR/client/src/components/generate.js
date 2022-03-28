@@ -2,19 +2,20 @@ import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-export const Playlist = ({ spotifyApi, token }) => {
+export const Playlist = ({ token }) => {
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   const navigate = useNavigate();
   axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
-  const [playlistD, setPlaylistD] = useState(null);
-  const request = () => {
+
+  // onload calls the generate playlist request
+  useEffect(() => {
     const data = { accessToken: token, playlist: id };
     axios
       .post(BACKEND_URL+"/python", {}, { params: data })
       .then((response) => {
-        if(response && response.data && response.data.output && response.data.output.length == 22){
+        if(response && response.data && response.data.output && response.data.output.length === 22){
             navigate("/home/playlist/" + response.data.output);
             // console.log(response);
         } else {
@@ -23,11 +24,8 @@ export const Playlist = ({ spotifyApi, token }) => {
             console.log(response);
         }
       });
-  };
-  useEffect(() => {
-    request();
-  }, []);
-  //   console.log(playlist.items)
+  }, [setLoading, id, navigate, token, BACKEND_URL]);
+
   return (
     <div className="min-h-screen changingbg flex items-center justify-center">
       <div className="bg-gray-700 text-center rounded-3xl md:shadow-lg p-10 pt-16 relative">

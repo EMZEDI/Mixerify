@@ -28,7 +28,7 @@ export const Playlist = ({ spotifyApi }) => {
         console.error(err);
       }
     );
-  }, []);
+  }, [id, spotifyApi]);
   //   console.log(playlist.items)
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -38,13 +38,14 @@ export const Playlist = ({ spotifyApi }) => {
             <Link className="text-emerald-400 md:pt-0 pt-2 md:mb-4 block md:text-xl" to="/home">
               &larr; Back Home
             </Link>
-            <img className="md:w-44 w-28 py-4" src={spotify} />
+            <img alt="Spotify" className="md:w-44 w-28 py-4" src={spotify} />
             {playlistD && (
               <>
                 <div className="flex items-center">
                   {playlistD.images.length > 0 && (
                     <img
-                      className="w-28 h-28 md:w-60 md:h-60 mr-10 shadow-xl"
+                    alt="Playlist Art"  
+                    className="w-28 h-28 md:w-60 md:h-60 mr-10 shadow-xl"
                       src={playlistD.images[0].url}
                     />
                   )}
@@ -98,6 +99,7 @@ export const Playlist = ({ spotifyApi }) => {
                     </div>
                     <div className="-ml-6 md:ml-0 h-16 w-16">
                       <img
+                        alt="Album Art"
                         className="w-16 h-16"
                         src={s.track.album.images[0].url}
                       />

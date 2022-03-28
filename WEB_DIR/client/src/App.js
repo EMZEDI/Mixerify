@@ -4,12 +4,11 @@ import {
   BrowserRouter,
   Routes,
   Route,
-  Link,
   Navigate,
   useLocation,
 } from "react-router-dom";
 import "./App-compiled.css";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Auth from "./components/auth";
 import Playlist from "./components/playlist";
 import SpotifyWebApi from "spotify-web-api-js";
@@ -75,7 +74,7 @@ function App() {
           path="/home/generate/:id"
           element={
             <RequireAuth token={token}>
-              <Generate spotifyApi={spotifyApi} token={token} />
+              <Generate token={token} />
             </RequireAuth>
           }
         />
