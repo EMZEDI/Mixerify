@@ -15,7 +15,7 @@ export const Home = ({
       spotifyApi.getMe().then(
         function (data) {
           setUser(data);
-          // console.log(data);
+          console.log(data);
         },
         function (err) {
           console.error(err);
@@ -26,14 +26,15 @@ export const Home = ({
       limit:50
     }).then(
       function (data) {
-        // console.log(data.items);
+        console.log(data.items);
         setPlaylists(data);
       },
       function (err) {
         console.error(err);
       }
     );
-  }, [setPlaylists, setUser, spotifyApi, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[]);
 
   return (
     <div className="w-full md:flex text-white">

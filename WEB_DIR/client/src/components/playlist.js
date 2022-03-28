@@ -28,7 +28,8 @@ export const Playlist = ({ spotifyApi }) => {
         console.error(err);
       }
     );
-  }, [id, spotifyApi]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   //   console.log(playlist.items)
   return (
     <div className="min-h-screen flex items-center justify-center">

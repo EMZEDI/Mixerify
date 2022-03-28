@@ -24,7 +24,8 @@ export const Playlist = ({ token }) => {
             console.log(response);
         }
       });
-  }, [setLoading, id, navigate, token, BACKEND_URL]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="min-h-screen changingbg flex items-center justify-center">
