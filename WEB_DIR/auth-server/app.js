@@ -70,7 +70,7 @@ app.post("/python", (req, res) => {
 app.get("/login", function (req, res) {
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
-  var scope = "user-read-private user-library-modify playlist-modify-public";
+  var scope = "user-read-private user-library-modify playlist-modify-public user-library-read playlist-read-private playlist-read-collaborative";
   res.redirect(
     "https://accounts.spotify.com/authorize?" +
       querystring.stringify({
