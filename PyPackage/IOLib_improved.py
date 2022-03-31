@@ -348,7 +348,7 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
     :param user_start_index: index of first user song in mixed dataframe
     :return: dict mapping clusters to list of recommendations
     """
-    neighbors = {}
+   neighbors = {}
 
     for i in range(len(cluster_user_list)):
         neighbors[i] = []
@@ -375,7 +375,7 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
                 j = i + 1 # keeps track of the neighbor we look at
 
                 #check for duplicates (duplicates within playlist accounted for by fct)
-                while pred_tup[1] in songs_indices_added:
+                while j != models[cluster].n_samples_fit_ and pred_tup[1] in songs_indices_added:
                     pred_tup = pred[0][0][j], pred[1][0][j]
                     j += 1
 
@@ -388,9 +388,9 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
 
         #check that this always outputs 50 songs
         if n < 50:
-            songs_per_cluster = int(round((len(neighbors[cluster]) / (n*recs_per_song)) * 50, 0))
+            songs_per_cluster = int(math.ceil((len(neighbors[cluster]) / (n*recs_per_song)) * 50))
         else:
-            songs_per_cluster = int(round((len(neighbors[cluster])/n)*50, 0))
+            songs_per_cluster = int(math.ceil((len(neighbors[cluster])/n)*50))
 
         neighbors[cluster] = neighbors[cluster][:songs_per_cluster]
 
@@ -411,7 +411,7 @@ def generate_recommendation_ids(rec_list: dict, cluster_dataset: dict):
     recs_tup.sort()
     recs = [id for dist, id in recs_tup]
 
-    return recs
+    return recs[:50]
 
 
 def generate_csvFile_for_sourceData(feature_df):
