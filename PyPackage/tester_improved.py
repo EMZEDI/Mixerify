@@ -23,10 +23,10 @@ df = pd.read_pickle(URL_MODIFIER+"dataset.pkl")
 # print("read the main data")
 
 user_df = create_feature_dataset([ID], sp)
-user_df.to_pickle(URL_MODIFIER+"user.pkl")
+#user_df.to_pickle(URL_MODIFIER+"user.pkl")
 # print("read the user data")
 
-user_df = pd.read_pickle(URL_MODIFIER+"user.pkl")
+#user_df = pd.read_pickle(URL_MODIFIER+"user.pkl")
 # print("loaded data")
 
 norm_df = pd.read_pickle(URL_MODIFIER+"model_pkls//norm_df.pkl") #this is saved
