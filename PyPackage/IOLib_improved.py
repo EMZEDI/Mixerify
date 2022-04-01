@@ -348,7 +348,7 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
     :param user_start_index: index of first user song in mixed dataframe
     :return: dict mapping clusters to list of recommendations
     """
-   neighbors = {}
+    neighbors = {}
 
     for i in range(len(cluster_user_list)):
         neighbors[i] = []
