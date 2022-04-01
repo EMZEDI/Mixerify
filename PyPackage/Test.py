@@ -1,45 +1,52 @@
 from IOLib import *
 import os
+import sys
 
-# spotify data
+# take in user access token and playlist ID from args
+TOKEN = sys.argv[1]
+ID = sys.argv[2]
+URL_MODIFIER="../../PyPackage/"
 
-client_id = os.environ.get('SPOTIPY_CLIENT_ID')
-client_secret = os.environ.get('SPOTIPY_CLIENT_SECRET')
-REDIRECT_URI = "http://127.0.0.1:8000"  # this must be changed when the website is deployed
+# setup spotify
+sp = spotipy.Spotify(auth=TOKEN)
+current = sp.playlist(ID)['name']
 
-# create the authentication and redirect the user to log in
-auth = spotipy.oauth2.SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=REDIRECT_URI,
-                                   scope="user-library-modify,playlist-modify-public")
-token_dict = auth.get_access_token()
-sp = spotipy.Spotify(auth_manager=auth)
-playlist = sp.user_playlist_create(sp.me()['id'], name="Personalized playlist AI")
+# create new playlist
+playlist = sp.user_playlist_create(sp.me()['id'], name=current+" AI Remix")
+print(playlist['id'],end="")
+# print("created the playlist for the user init")
 
-# get the user entered playlist data
-user_init_playlistID = input("what is your input?")
-id = user_init_playlistID.replace("https://open.spotify.com/playlist/", '')
-id = id[:id.find('?')]
-user_df = create_feature_dataset([id], sp)
-# read the main dataset to recommend the songs from
-df = pd.read_csv("../DATABASE/MAIS202data.csv")
-# merge user and main dataset
-output = merge_UserInput_with_SourceDF(user_df=user_df, source_df=df)
-# normalize the output
-norm = normalize_dataframe(output[0])
-# get the number of the clusters
-num = num_clusters(data_frame=norm)
-model = create_cluster_for_mixed_data(num, norm)  # KMeans model
-cluster_list = get_cluster_dataset(model, num, norm, output[1])  # dict of clusters of whole thing
-cluster_user_list = get_cluster_user(model, num, norm, output[1])  # dict of clusters of only user
+#### ml stuff ####
 
-models = KNN_models(cluster_list, norm)  # KNN models
+df = pd.read_pickle(URL_MODIFIER+"dataset.pkl")
+# print("read the main data")
 
-recs = generate_recommendations(models, cluster_user_list, norm, output[1])  # create recs
+user_df = create_feature_dataset([ID], sp)
+user_df.to_pickle(URL_MODIFIER+"user.pkl")
+# print("read the user data")
 
-recs_id = generate_recommendation_ids(recs, cluster_list)  # generate the ids
+user_df = pd.read_pickle(URL_MODIFIER+"user.pkl")
+# print("loaded data")
 
-final = []
-links = [('https://open.spotify.com/track/' + id2) for id2 in recs_id]
-for link in links:
-    final.append(link)
+output = merge_UserInput_with_SourceDF(user_df, df)
+norm_out = normalize_dataframe(output[0])
+# print("merged and normalized")
 
-sp.playlist_add_items(playlist["id"], final)
+num = num_clusters(data_frame=norm_out)
+# print("num clusters:", num)
+model = create_cluster_for_mixed_data(num, norm_out)  # KMeans model
+# print("created clusters")
+cluster_list = get_cluster_dataset(model, num, norm_out, output[1])  # dict of clusters of whole thing
+cluster_user_list = get_cluster_user(model, num, norm_out, output[1])  # dict of clusters of only user
+# print("got cluster list")
+models = KNN_models(cluster_list, norm_out[:output[1]])  # KNN models
+# print("made KNN models")
+recs = generate_recommendations(models, cluster_user_list, norm_out, output[1])
+# print(recs)
+
+recs_id = generate_recommendation_ids(recs, cluster_list)
+# print(recs_id)
+# print(len(recs_id))
+
+# add to playlist
+sp.playlist_add_items(playlist["id"], recs_id)
