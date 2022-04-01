@@ -8,7 +8,7 @@ import plotly.graph_objs as go
 from yellowbrick.cluster import KElbowVisualizer
 from sklearn.cluster import KMeans
 from sklearn.neighbors import NearestNeighbors
-import pickle, math, time
+import pickle, math
 
 
 
@@ -368,7 +368,7 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
 
         for idx in indices:
             for i in range(recs_per_song):
-
+                #predict cluster
                 pred = models[cluster].kneighbors([dataframe.iloc[idx]], return_distance=True)
 
                 pred_tup = pred[0][0][i], pred[1][0][i]
@@ -386,15 +386,17 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
     for cluster in neighbors:
         neighbors[cluster].sort()
 
-        #check that this always outputs 50 songs
+        #find the num of songs per cluster using ratio
         if n < 50:
             songs_per_cluster = int(math.ceil((len(neighbors[cluster]) / (n*recs_per_song)) * 50))
         else:
             songs_per_cluster = int(math.ceil((len(neighbors[cluster])/n)*50))
-
+       
+        #add songs 
         neighbors[cluster] = neighbors[cluster][:songs_per_cluster]
 
     return neighbors
+
 
 def generate_recommendation_ids(rec_list: dict, cluster_dataset: dict):
     """
@@ -431,77 +433,3 @@ def get_link_from_id(id: int):
     """
 
     return 'http://open.spotify.com/track/' + str(id)
-
-  
-'''
-TESTING STUFF
-t1 = time.time()
-
-#SPOTIFY STUFF
-
-REDIRECT_URI = "http://127.0.0.1:8000"
-scope = 'user-library-read'
-client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SECRET)
-sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
-#sp = spotipy.Spotify(auth_manager=spotipy.SpotifyOAuth(scope=scope))
-auth = spotipy.oauth2.SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID, client_secret=SECRET, redirect_uri=REDIRECT_URI, scope="user-library-modify,playlist-modify-public")
-token_dict = auth.get_access_token()
-playlist = sp.user_playlist_create('31zy4fmqdtlr7txsbclu32cxbclm', 'Bonnie\'s new AI playlist')
-#print('did Spotify thing')
-
-#ML STUFF
-#
-#df = create_feature_dataset(['4bB4tur5SejOW9Nl7bM7tX'], sp)
-#df.to_pickle("dataset.pkl")
-df = pd.read_pickle("playlist_pkls//dataset.pkl")
-
-#16Uj14Ek0EREN2NmKe8FOB
-#https://open.spotify.com/playlist/3XL46hsF6P384x1Sr79CfF?si=9f396ff02b6b499a
-user_df = create_feature_dataset(['3XL46hsF6P384x1Sr79CfF'], sp)
-user_df.to_pickle("playlist_pkls//bonnie.pkl")
-user_df = pd.read_pickle("playlist_pkls//bonnie.pkl") #classical music
-#print("loaded data")
-
-output = merge_UserInput_with_SourceDF(user_df, df) #not normalized output
-
-#norm_df = normalize_dataframe(df) #normalized dataset only --> use so we can obtain the duplicates
-#norm_df.to_pickle("model_pkls//norm_df.pkl")
-norm_df = pd.read_pickle("model_pkls//norm_df.pkl")
-
-norm_out = normalize_dataframe(output[0]) #normalized --> no store since we will use it later
-#print("merged and normalized")
-
-#num = num_clusters(data_frame=norm_df) #this is smtg we save
-#print("num clusters:", num)
-
-num = 7
-#model = create_cluster_for_data(num, norm_df) #KMeans model to save, use norm_df to take all songs w/o duplicates
-#pickle.dump(model, open( "kmeans.pkl", "wb" ))
-model = pickle.load(open( "kmeans.pkl", "rb" ))
-#print("created clusters")
-
-#cluster_list = get_cluster_dataset(model, num, norm_df) #dict of clusters of whole thing
-#pickle.dump(cluster_list, open( "cluster_list.pkl", "wb" ))
-cluster_list = pickle.load(open( "cluster_list.pkl", "rb" ))
-cluster_user_list = get_cluster_user(model, num, norm_out, output[1]) #dict of clusters of only user --> should we use the norm_user instead of merged?
-#print("got cluster list")
-
-#models = KNN_models(cluster_list, norm_df) #KNN models using only dataset songs
-#pickle.dump(models, open( "knn.pkl", "wb" ))
-models = pickle.load(open( "knn.pkl", "rb" ))
-#print("made KNN models")
-
-recs = generate_recommendations(models, cluster_user_list, norm_out, output[1])
-
-recs_id = generate_recommendation_ids(recs, cluster_list)
-
-
-#add to playlist
-sp.playlist_add_items(playlist["id"], recs_id)
-
-#print("done!")
-
-t2 = time.time()
-
-print("runtime: ", t2-t1)
-'''
