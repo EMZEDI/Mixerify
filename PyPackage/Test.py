@@ -5,27 +5,27 @@ import sys
 # take in user access token and playlist ID from args
 TOKEN = sys.argv[1]
 ID = sys.argv[2]
-URL_MODIFIER="../../PyPackage/"
+URL_MODIFIER = "../../PyPackage/"
 
 # setup spotify
 sp = spotipy.Spotify(auth=TOKEN)
 current = sp.playlist(ID)['name']
 
 # create new playlist
-playlist = sp.user_playlist_create(sp.me()['id'], name=current+" AI Remix")
-print(playlist['id'],end="")
+playlist = sp.user_playlist_create(sp.me()['id'], name=current + " AI Remix")
+print(playlist['id'], end="")
 # print("created the playlist for the user init")
 
 #### ml stuff ####
 
-df = pd.read_pickle(URL_MODIFIER+"dataset.pkl")
+df = pd.read_pickle(URL_MODIFIER + "dataset.pkl")
 # print("read the main data")
 
 user_df = create_feature_dataset([ID], sp)
-user_df.to_pickle(URL_MODIFIER+"user.pkl")
+user_df.to_pickle(URL_MODIFIER + "user.pkl")
 # print("read the user data")
 
-user_df = pd.read_pickle(URL_MODIFIER+"user.pkl")
+user_df = pd.read_pickle(URL_MODIFIER + "user.pkl")
 # print("loaded data")
 
 output = merge_UserInput_with_SourceDF(user_df, df)

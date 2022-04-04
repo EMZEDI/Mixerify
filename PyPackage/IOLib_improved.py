@@ -10,8 +10,6 @@ from sklearn.cluster import KMeans
 from sklearn.neighbors import NearestNeighbors
 import pickle, math
 
-
-
 # YOUR spotify data
 '''
 SPOTIPY_CLIENT_ID = ""
@@ -20,6 +18,7 @@ spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(
        client_id=SPOTIPY_CLIENT_ID,
        client_secret=SECRET))
 '''
+
 
 def run_spotifyForDev(client_id, client_secret):
     """
@@ -144,6 +143,7 @@ def merge_UserInput_with_SourceDF(user_df: pd.DataFrame, source_df: pd.DataFrame
     start = start - (prev_size - new_size)
     return final_df, start
 
+
 def normalize_dataframe(df: pd.DataFrame):
     """
     Normalizes the features in merged dataframe (manually)
@@ -153,9 +153,10 @@ def normalize_dataframe(df: pd.DataFrame):
     scaler = MinMaxScaler()
     normalized = scaler.fit_transform(df)
 
-    #reestablish pd dataframe (bc it is now an numpy array)
+    # reestablish pd dataframe (bc it is now an numpy array)
     normalized_df = pd.DataFrame(data=normalized, index=df.index, columns=df.columns)
     return normalized_df
+
 
 def generate_csvFile_for_sourceData(feature_df):
     """
@@ -282,11 +283,12 @@ def get_cluster_dataset(model: KMeans, num_clusters: int, dataframe: pd.DataFram
     cluster = model.labels_
 
     for i in range(len(cluster)):
-        #print(i)
+        # print(i)
         id = dataframe.index[i]
         d[cluster[i]].append((id, i))
 
     return d
+
 
 def get_cluster_user(model: KMeans, num_clusters: int, dataframe: pd.DataFrame, user_start_index: int):
     """
@@ -304,12 +306,12 @@ def get_cluster_user(model: KMeans, num_clusters: int, dataframe: pd.DataFrame, 
     for i in range(num_clusters):
         d[i] = []
 
-    #list of clusters for each user song
+    # list of clusters for each user song
     cluster = model.predict(dataframe[user_start_index:])
 
     for i in range(len(cluster)):
         id = dataframe.index[i]
-        d[cluster[i]].append((id, i+user_start_index))
+        d[cluster[i]].append((id, i + user_start_index))
 
     return d
 
@@ -325,15 +327,16 @@ def KNN_models(cluster_list: dict, dataframe: pd.DataFrame):
     models = dict.fromkeys(keys)
 
     for cluster in cluster_list:
-        #we want all neighbors
+        # we want all neighbors
         neigh = NearestNeighbors(n_neighbors=len(cluster_list[cluster]))
         indices = [index for id, index in cluster_list[cluster]]
 
-        #dataframe with just rows of songs in the cluster
+        # dataframe with just rows of songs in the cluster
         model = neigh.fit(dataframe.iloc[indices, :].values)
         models[cluster] = model
 
     return models
+
 
 def generate_recommendations(models: list, cluster_user_list: dict, dataframe: pd.DataFrame, user_start_index: int):
     """
@@ -353,13 +356,13 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
     for i in range(len(cluster_user_list)):
         neighbors[i] = []
 
-    #num user songs
+    # num user songs
     n = len(dataframe) - user_start_index
 
     recs_per_song = 1
     if n < 50:
-        #find how many recs per song to find
-        recs_per_song = math.ceil(50/n)
+        # find how many recs per song to find
+        recs_per_song = math.ceil(50 / n)
 
     for cluster in cluster_user_list:
 
@@ -368,13 +371,13 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
 
         for idx in indices:
             for i in range(recs_per_song):
-                #predict cluster
+                # predict cluster
                 pred = models[cluster].kneighbors([dataframe.iloc[idx]], return_distance=True)
 
                 pred_tup = pred[0][0][i], pred[1][0][i]
-                j = i + 1 # keeps track of the neighbor we look at
+                j = i + 1  # keeps track of the neighbor we look at
 
-                #check for duplicates (duplicates within playlist accounted for by fct)
+                # check for duplicates (duplicates within playlist accounted for by fct)
                 while j != models[cluster].n_samples_fit_ and pred_tup[1] in songs_indices_added:
                     pred_tup = pred[0][0][j], pred[1][0][j]
                     j += 1
@@ -382,17 +385,16 @@ def generate_recommendations(models: list, cluster_user_list: dict, dataframe: p
                 neighbors[cluster].append(pred_tup)
                 songs_indices_added.append(pred_tup[1])
 
-
     for cluster in neighbors:
         neighbors[cluster].sort()
 
-        #find the num of songs per cluster using ratio
+        # find the num of songs per cluster using ratio
         if n < 50:
-            songs_per_cluster = int(math.ceil((len(neighbors[cluster]) / (n*recs_per_song)) * 50))
+            songs_per_cluster = int(math.ceil((len(neighbors[cluster]) / (n * recs_per_song)) * 50))
         else:
-            songs_per_cluster = int(math.ceil((len(neighbors[cluster])/n)*50))
-       
-        #add songs 
+            songs_per_cluster = int(math.ceil((len(neighbors[cluster]) / n) * 50))
+
+        # add songs
         neighbors[cluster] = neighbors[cluster][:songs_per_cluster]
 
     return neighbors
@@ -405,7 +407,7 @@ def generate_recommendation_ids(rec_list: dict, cluster_dataset: dict):
     :param cluster_dataset: dict mapping clusters to songs from dataset in that cluster
     :return: list of song IDs
     """
-    recs_tup = [] #list of tuples of distance and ID
+    recs_tup = []  # list of tuples of distance and ID
 
     for cluster in rec_list:
         for dist, index in rec_list[cluster]:
@@ -424,6 +426,7 @@ def generate_csvFile_for_sourceData(feature_df):
     """
     feature_df.to_csv('C:\\Users\\etomi\\Desktop\\Uni W2022\\MAIS202\\project\\data_norm.csv')
     return
+
 
 def get_link_from_id(id: int):
     """
