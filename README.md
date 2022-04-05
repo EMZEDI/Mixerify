@@ -40,7 +40,7 @@ To choose the final songs, we used KNN model from Scikit-learn to iterate throug
 
 ### Website creation
 
-The front end is built in React.js with Tailwind with authentication and machine learning Python scripts run using a backend server built with Express.
+The front end is built in React.js and styled with Tailwind. We take advantage of several React libraries including spotify-web-api-js for Spotify API calls and Axios for REST calls. The backend handles authentication using Spotify OAuth and uses Express.js to set up REST endpoints to run the machine learning Python scripts.
 
 ---
 
@@ -65,7 +65,7 @@ and
 
 **Hanna**: Data Cleaning, Machine Learning developer and testing 
 
-**Tristan**:Full stack web development and testing
+**Tristan**: Full Stack Web Development and testing
 
 ---
 
