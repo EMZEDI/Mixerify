@@ -32,7 +32,7 @@ We initially created an API for our model to iterate through the entered playlis
 
 The machine learning process was mainly using the Scikit-learn functions and plotting the results using Seaborn and Plotly. An instance of a graph generated from the main dataset of songs that we recommend songs from can be seen below:
 
-![](./"cluster 2d.jpg")
+![](./cluster 2d.jpg)
 
 Used KMeans model and plotly to generate the plot.
 
